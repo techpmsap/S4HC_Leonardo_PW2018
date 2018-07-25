@@ -26,7 +26,7 @@ S/4 HANA Cloud & Leonardo Powerweek 2018 - Exercises
 - [Exercise\_21 - Building a project with the Neo archetype](Day2/Exercise_21/Exercise_21.md)
 - [Exercise\_22 - Building a project with CF archetype](Day2/Exercise_22/Exercise_22.md)
 - [Exercise\_23 - Creating your own Communication Arrangement](Day2/Exercise_23/Exercise_23.md)
-- [(***Work in progress***) Exercise\_24 - Retrieving data from S4HC and setting up integration tests](Day2/Exercise_24/Exercise_24.md)
+- [Exercise\_24 - Retrieving data from S4HC and setting up integration tests](Day2/Exercise_24/Exercise_24.md)
 - [(***Work in progress***) Exercise\_25 - Retrieving data from S4HC and deploying to Neo](Day2/Exercise_25/Exercise_25.md)
 - [(***Work in progress***) Exercise\_26 - Make the application resilient](Day2/Exercise_26/Exercise_26.md)
 - [(***Work in progress***) Exercise\_27 - Add a caching mechanism to your application](Day2/Exercise_27/Exercise_27.md)
