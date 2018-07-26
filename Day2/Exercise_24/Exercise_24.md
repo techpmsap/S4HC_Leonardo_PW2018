@@ -275,7 +275,7 @@ To define a destination for our application we need two services from the market
 	  - bpr_destination
 	```
 
-	to your manifest file replacing the red ones. Your final file should look like this. Rememebr to **save** the file
+	to your manifest file replacing the red ones. Please also increase the **memory** size to **1024** so that we can have much space for retrieving business partners. Your final file should look like this. Rememebr to **save** the file
 	>NOTE 1: Please pay big attention to the indentattion of the lines you are adding because the YML files are pretty sensitive to this.
 		
 	![](images/39.png)
