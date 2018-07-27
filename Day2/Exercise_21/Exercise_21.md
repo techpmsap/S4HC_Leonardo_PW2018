@@ -186,7 +186,7 @@ This is an optional step for this exercise. You can try to deploy this applicati
 
 1. Specify an **application name** or keep the default one
 
-1. Change the **Java Runtime Name** to be **Java Web Tomcat 7** or **Java Web Tomcat 8** and click on **Deploy**  
+1. Change the **Java Runtime Name** to be **Java EE 7 Web Profile TomEE 7**, choose **JRE 8** as JVM Version and click on **Deploy**  
 	![](images/16.png)
 
 1. The application will be deployed to Neo. After a while you should get the following message. Click on **Start**  
