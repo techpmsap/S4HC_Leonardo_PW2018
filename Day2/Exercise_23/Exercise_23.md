@@ -63,7 +63,10 @@ In the upcoming exercises you will learn how to retrieve and work with data usin
 	| --------- | ----- |
 	| Host Name | localhost |
 	| Logical System | LOCALHOST |
+	| UI Host Name | localhost |
+	| Business System | BP\_EXT\_SYSTEM\_\<LOC\>\_XX |
 	
+	(remember to replace **\<LOC\>** with the location's acronym where you are attending the workshop (i.e. WDF for Walldorf) and **XX** with your workstation ID)
 	![](images/06.png)
 
 1. Scroll down the page to the **User for Inbound Connection** section and click on the **+** sign to add a new user  
@@ -78,7 +81,7 @@ In the upcoming exercises you will learn how to retrieve and work with data usin
 	| --------- | ----- |
 	| User Name | BP\_EXT\_CU\_\<LOC\>\_XX |
 	| Description | BP External Communication User \<LOC\> XX |
-	| Password | "A password with at least 8 chars with a upper case char,numbers and a special character (i.e. Welcome123#)" |
+	| Password | A password with at least 20 chars with a upper case char,numbers and a special character (i.e. "**Welcome2thisworkshop!**") |
 
 (where **\<LOC\>** with the location's acronym where you are attending the workshop and **XX** is your workstation ID)
 
