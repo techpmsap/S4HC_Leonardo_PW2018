@@ -1,0 +1,8 @@
+#Exported connectivity destination
+#Mon Aug 07 16:39:22 CDT 2017
+URL=https\://www.google.com
+Name=search_engine_destination
+TrustAll=true
+ProxyType=Internet
+Type=HTTP
+Authentication=NoAuthentication

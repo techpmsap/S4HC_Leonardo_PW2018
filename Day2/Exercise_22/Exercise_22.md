@@ -1,221 +1,257 @@
 <table width=100% border=>
-<tr><td colspan=2><h1>EXERCISE 2_2 - BUILDING A PROJECT WITH THE CF ARCHETYPE</h1></td></tr>
-<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;30 min</h1></td></tr>
+<tr><td colspan=2><h1>EXERCISE 01 - IoT : End to End scenario using MQTT and Gateway Cloud</h1></td></tr>
+<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 mins</h1></td></tr>
 </table>
 
 
 ## Description
-In this exercise, you’ll learn how 
+This document provides you with the steps for the hands-on session on SAP Cloud Platform Internet of Things. This scenario will help you to go through the following activities:
 
-* to install and configure Eclipse IDE
-* to create a SAP S/4HANA Cloud SDK project for Cloud Foundry from an archetype using the Eclipse IDE
-* to build the project with Eclipse IDE
-* to deploy the application to your Cloud Foundry environment
+* Creating Device Data Model in IoT Service Cockpit
+* Device onboarding on Gateway Cloud for MQTT protocol.
+* Sending Sensor Data from Paho MQTT Client
+* Consuming Data via IoT Service Cockpit
 
-For further reading on S/4HANA Cloud SDK, click link below.
-<https://www.sap.com/germany/developer/topics/s4hana-cloud-sdk.html>
+>NOTE: Use Google Chrome browser.
 
 
 ## Target group
 
 * Developers
-* People interested in learning about S/4HANA extension and SDK  
+* People interested in SAP Leonardo and IoT
 
 
 ## Goal
 
-The goal of this exercise is to create a Maven project for Cloud Foundry starting from the scp-cf-tomee archetype made available with the SAP S/4HANA Cloud SDK.
+The goal of this exercise is to create a new device data model in the IoT Service cockpit, to onboard a new device with a sensor with SAP Gateway Cloud for MQTT protocol, to send data with Paho MQTT Client and finally to consume them via IoT Service Cockpit
+
 
 
 ## Prerequisites
-  
-Here below are prerequisites for this exercise.
 
-* A trial account on the SAP Cloud Platform. You can get one by registering here <https://account.hanatrial.ondemand.com>
-* Apache Maven
-* Java JDK 8
+Below are some of the prerequisites for this exercise.
+
+* A Remote Desktop Connection app. Credentials to logon will be provided by your instructor
+* An SAP IoT Service cockpit system with user credentials which will be provided by your instructor
 
 
 ## Steps
 
-1. [Create your first project](#project-creation)
-1. [Deploy the app to Cloud Foundry](#deploy-to-cf)
-1. [Switch from random to fixed route](#fixed-route)
+1. [Introduction](#introduction)
+1. [Creating device data model](#creating-device-data-model)
+1. [Device and sensor onboarding](#device-and-sensor-onboarding)
+1. [Sending messages via MQTT using Paho client](#mqtt-Paho)
+1. [Consuming and viewing sensor data](#consuming-sensor-data)
 
-### <a name="project-creation"></a> Create your first project
-In this chapter you are going to create your first project using the S/4HANA Cloud SDK. This is just a "Hello World" project, which means that it's just a very basic Java application serving a page which displays a simple "Hello World" message. Let's start with this and you will learn how to modify this project in the next exercises.
 
-1. Before you start please connect with your SAP Cloud Platform and get your UserID by clicking on your user name in the top right corner 
-	![](images/07.png)
 
-2. Write down this ID since it will be used along with the next steps and the next exercises. Use it when asked for your **\<SAP\_CP\_USER\_ID\>**  
-	![](images/08.png)
+### <a name="introduction"></a> Introduction
+The SAP Cloud Platform Internet of Things Service enables customers and partners to develop, customize, and operate IoT business applications in the cloud. SAP CP IoT Service provides Lifecycle management at scale for IoT devices from onboarding to decommissioning. It also provides a way to securely connect to remote devices over a broad variety of IoT protocols. It provides gateway Edge which provides on-premise IoT edge processing and also gateway cloud which does centralized cloud based processing. The **IoT cockpit** is the user interface of the solution and provides access to various functions. It is the main user interface for users to interact with the Internet of Things core service. It can be used for creating users and tenants, for creating device data models, for device onboarding and decomissioning, for adding new networks and to visualize the data which are being ingested via IoT devices/sensors.  
+	![](images/01.png)
 
-1. Now, launch Eclipse IDE
 
-1. Go to **File -> New -> Project...**  
+
+### <a name="creating-device-data-model"></a> Creating device data model
+Centralized Device data model provides the schema of device related configurations including the data fields that will be exchanged. In order to send data to the IoT service a device data model is required. The device entity must have at least one sensor assigned to it. In case, no sensor is created beforehand a Sensor will be automatically created during data ingestion (default behavior). A new sensor type can be added with capabilities(measures/commands). A capability can be reused since it can be assigned to multiple sensor types and each capability can have one or many properties. 
+In the section below, using the IoT Service Cockpit, initially two capabilities("Soil pH and Moisture") are created, then a sensor type is created and the capabilities are assigned to it. A device is then created and will have one sensor, which is of the custom sensor type.
+
+1.	Open the browser and navigate to the IoT Service Cockpit URL and log on with the tenant user credentials, provided by the instructor  
+	![](images/02.png)
+
+1.	Use the main menu to navigate to the **Device Management** -> **Capabilities** section and click on the **"+"** sign, to add first capability Soil pH  
+	![](images/03.png)
+
+1. In the **General information** section enter **Name** as **Soil_pH** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
+
+	| Parameter | Value    |
+	| --------- | -------- |
+	| Name | Soil\_pH     |
+	| Data Type | float    |
+	| Unit Of Measure | pH |
+
+	![](images/04.png)
+
+1. Once again navigate to **Capabilities** section and click on the "**+**" sign to add the second capability Soil_Moisture.  
+	![](images/05.png)   
+
+1. In the **General information** section enter **Name** as **Soil_Moisture** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
+
+	| Parameter | Value      |
+	| --------- | ---------- |
+	| Name | Soil\_Moisture |
+	| Data Type | float      |
+	| Unit Of Measure | %    |
+
+	![](images/06.png)
+
+1. Navigate to **Device Management** -> **Sensor Types** and click on the "**+**" sign to add a sensor type for the Soil Sensor   
 	![](images/09.png)
 
-1. Select **Maven -> Maven Project** and click **Next**  
-	![](images/10.png)
+1. In the **General information** section enter **Name** as **gh_soil_sensor_typ_XX**, where **XX** is your workstation ID and in the **Capabilities** section enter and add the earlier created capabilities
 
-1. Click on **Next**  
+	| Capability | Type       |
+	| --------- | ----------- |
+	| Soil_pH | measure       |
+	| Soil_Moisture | measure |
+
+	![](images/10.png)
 	![](images/11.png)
 
-1. Since this is the first time we use the SDK we need to configure the Maven Central repository in Eclipse. Click **Configure**   
+	Click on **Create**. Ensure the Sensor Type is created successfully
+
+1. Congratulations! You have successfully created a new data model.
+
+### <a name="device-and-sensor-onboarding"></a> Device and sensor onboarding
+Each device exchanges data with a specific protocol (for example: MQTT in this exercise).  Each device corresponds to 1 unique physical device. We need to create a device that corresponds to a physical device. In the following section, it is described how to create a Device for the MQTT network. Also we onboard the sensor for the Device.
+
+1.	Use the main menu to navigate to **Device Management** -> **Devices** section and click on the "**+**" sign to start the device creation process
+
+	>NOTE: As an alternative, devices and sensors can also be created via APIs. In this exercise, we will create it via UI cockpit  
+
 	![](images/12.png)
 
-1. Click **Add Remote Catalog...**   
+1.	In the **General Information** section, enter the following information and click on **Create**
+
+	| Parameter | Value |
+	| --------- |----- |
+	| Name | gh_soil_device_XX |
+	| Gateway |MQTT Network |
+	| Alternate ID | \<leave it blank\> |
+
+	>NOTE: Ignore the Alternate ID as it's optional and is filled on Create. This would be required at later steps to be provided in Paho Client as well    
+
 	![](images/13.png)
 
-1. Enter the following values and ckick **OK**   
+1.	In the new device, Sensor tab click on the "**+**" sign to create a new sensor  
+	![](images/14.png)
 
-   Parameter			| Value   
-	-------------		| -------------   
-	Catalog File		| http://repo1.maven.org/maven2/   
-	Description		| S4HANA Cloud SDK   
-
- 	![](images/14.png)
-
-1. A new remote repository has been added, click on **Apply and Close**   
+1.	In the General Information section, enter a name such as "**gh_soil_sensor_XX**", replace XX for your workstation ID, select Sensor Type you have created earlier (i.e. gh_soil_sensor_typ_XX, where **XX** must be replaced with your workstation ID) and ignore the Alternate ID as it's optional. This Soil\_Sensor automatically provides Soil\_pH, Soil\_Moisture: these are the capabilities we have previously defined. Once done click on **Add**  
 	![](images/15.png)
 
-1. Type the text "**s4hana**" in the filter box and select the **scp-cf-tomee** artifact, then click **Next**   
+1.	The new sensor is created and you should be able to see the **gh_soil_sensor_XX** under the **Sensors** tab of the gh_soil_device_XX device onboarded earlier  
 	![](images/16.png)
 
-1. Set the following values replacing **xx** with the identifier received by your instructor and click **Finish**  
+1. Be sure that your gh_soil_device_XX device is selected, choose the **Certificate** tab and click on **Generate Certificate**  
+	![](images/17.png)
 
-   Parameter 			| Value   
-	-------------		| -------------   
-	Group Id  		| com.sap.sample   
-	Artifact Id		| bpr\_cf\_\<SAP\_CP\_USER\_ID\>
-	Version			| 0.0.1-SNAPSHOT
+1. Choose the Certificate Type **P12** and click **Generate**  
+	![](images/18.png)
 
- 	![](images/17.png)
-	
-1. The project is created. Once done, expand the **application** module and give a look to the *HelloWorldServlet.java* file located under the path *src/main/java/com/sap/sample/\<artifact_id\>*. This is your servlet: it will answer when you will call you application URL with the "/hello" endpoint (line 14). The answer will be a web page containing just the text "Hello World" (line 25)  
- 	![](images/18.png)
-
-1. Let's build this application. Expand the **root** module and right click on the *pom.xml* file. Select **Run As -> Maven build**  
+1. This will trigger a popup window providing you with a secret key which you must copy and save in notepad. Then click **OK**  
 	![](images/19.png)
 
-1. If required, enter the goals "clean install" and click **Run**  
+1. You can also see the downloaded certificate *Paho\_Client\_XX-device\_certificate.p12* in the Chrome browser status bar. Click on the small down arrow and choose **Show in folder**  
 	![](images/20.png)
 
-1. The project is built and you should receive a "BUILD SUCCESS" message  
+
+1. This will make you understand where the certificate is located. Please keep in mind this location since it will be used in the next section  
+	![](images/20a.png)
+
+1. Congratulations! You have successfully onboarded a new device and a new sensor.
+
+
+### <a name="mqtt-Paho"></a> Sending messages via MQTT using Paho client
+In this step, we will send the data from Device Simulator that supports MQTT protocol. We have already on-boarded this simulator device during previous steps. Once we send the data, it would be received by Internet of Things Gateway Cloud and would be visible in the IoT services cockpit and via APIs.
+
+1.	Launch the **MQTT Paho Client**, it should be located under the *C:\Student\PahoClient* folder  
 	![](images/21.png)
 
-
-### <a name="deploy-to-cf"></a> Deploy the app to Cloud Foundry
-Let's push the application to Cloud Foundry.
-
-1. Login to your [SAP Cloud Platform Trial Landscape](https://account.hanatrial.ondemand.com/cockpit) and click on the **Cloud Foundry Trial** tile  
+1. 	Click on **Run** in case you get a security warning  
 	![](images/22.png)
 
-1. Click on the **trial** subaccount  
+1.	Click on the "**+**" sign to create a new connection  
 	![](images/23.png)
 
-1. Write down or copy in the clipboard the endpoint to your Cloud Foundry space, since it will be required in the next steps. Then click on the small **1** indicating the number of available spaces: this will bring you to the list of all your spaces  
+1.	Configure the **MQTT** tab of **connection1** with this information
+
+	| Parameter | Value |
+	| --------- | ----- |
+	| Server URI | `ssl://<host_name>:8883` where **\<host\_name\>** is the host part in the cockpit  URL |
+	| Client ID | The AlternateID of the Device gh_soil_device_XX |
+
 	![](images/24.png)
 
-1. Click on the **dev** space (this is the default space assigned to you when you create an account on the Trial Landscape)  
+1.	Click on **OPTIONS** tab, select **Enable SSL** and click on the first **Browse...** button to specify the Key Store Location  
 	![](images/25.png)
 
-1. At moment your space does not contain any application yet  
+1.	Change the file extension search criteria to \*.p12 and browse for the *Paho\_Client\_XX-device\_certificate.p12* you have downloaded from IoT Service Cockpit  
 	![](images/26.png)
 
-1. Open your Terminal or Command Prompt and navigate to the folder where the project is located. For example, mine is under *\<HOME\>Workspaces/Eclipse/workspace01/bpr\_cf\_\<SAP\_CP\_USER\_ID\>*    
+1. 	As Key Store Password, specify the client secret you had copied in your notepad. Then click on the second **Browse...** button to locate the Trust Store repository  
 	![](images/27.png)
 
-1. Enter the command
-
-	```sh
-	cf api <your_api_endpoint>
-	```
-where **\<your\_api\_endpoint\>** is the link you copied in the previous step
+1. Change the file extension search criteria from \*.jks to \*.\* and go to the folder *\<JRE\_Installation\_Folder\>\jre\lib\security*, in your case it should be *C:\Program Files\Java\jre1.8.0_161\lib\security*. Once there, select the file *cacerts* and click **Open**  
 	![](images/28.png)
 
-1. You can now login to Cloud Foundry with the command. You will have to enter the email you used to register to the SAP CP Trial Landscape with its password
-
-	```sh
-	cf login
-	```	
+1. 	As Trust Store password, simply use the text "**changeit**"  
 	![](images/29.png)
 
-1. Make also sure that there are no other applications running in your CF environment so that you have plenty of space for this exercise  
+1.	Go to the **MQTT** tab and click on **Connect**  
 	![](images/30.png)
 
-1. Enter the command `cf push` to deploy the application to your CF environment. At the end of the process you should get a status of "running" for your application and you should be also able to read the automatically generated random route for accessing it  
+1.	Status should turn to **Connected** as shown in the picture  
 	![](images/31.png)
 
-1. At the same way, you can check the result by accessing your SAP Cloud Foundry cockpit. You should see a new application in your space: click on the  application name  
+1.	In the **Publish** section, enter the topic `measures/<alternate_id>` replacing `alternate_id` with the **Alternate ID** of the device  
 	![](images/32.png)
 
-1. You will get a lot of other important details about your running application. Among those details, you will find the application route (the same you have seen in the Terminal two steps ago). Click on this route link and the application's landing page will be opened  
+1. 	Use the default settings for **QOS**
+
+1. Copy the following JSON script and paste it in a text editor
+
+	```json
+	{
+	"capabilityAlternateId":[
+		"<<< Soil_pH Capability Alternate ID >>>",
+		"<<< Soil_Moisture Capability Alternate ID >>>"
+		],
+	"measures":[7,35],
+	"sensorAlternateId":"<<< Sensor Alternate ID >>>"
+	}
+	```
+
+1. Replace the **<<< Sensor Alternate ID >>>** with the **Alternate ID** you can read by going on your **gh_soil_sensor_XX** in your **gh_soil_device_XX** device  
 	![](images/33.png)
 
-1. The application's landing page is just a standard Tomcat welcome screen. Click on the **HelloWorldServlet** link  
+1. Then go to **Sensor Types** -> **gh_soil_sensor_typ_XX**  
 	![](images/34.png)
 
-1. The service you defined within the Java application is shown  
+1. Replace the **<<< Soil_pH Alternate ID >>>** with the Alternate ID of the Soil_pH capability  
 	![](images/35.png)
 
-1. You have successfully created your CF application with Eclipse IDE.
-
-
-### <a name="fixed-route"></a> Switch from random to fixed route
-Before we close this exercise we need to make one last important change: we need to get rid of the random route and create a fixed route for our application. When you create the application starting from the archetype it's configured to receive a random route from the system, so that, all the users pushing an application, can get a different path/URL to their apps. This is a good thing, of course, but if you delete an application and you push it again, it will receive a new route, which is different from the previous one. If this is not important here, it will be in the exercise where we are going to manage the Cloud Foundry Security through the Approuter component. The Approuter needs to point always to the same application URL otherwise it stops working. Of course, the application URLs will be still different for each user. You will better understand this later in this workshop.
-
-1. Copy the application URL the system generated for you, the one you used to access the "/hello" endpoint, and paste it in a text editor. Then remove the following parts of this string:
-	- "https://"
-	- the random name
-	- the "/hello" endpoint
-
-	Keep this string at hand because it will be used later
-	
+1. Repeat the previous 2 steps for the other capability (Soil_Moisture). At the end copy the JSON script you have created and paste it in the Message text area of your Paho Client. Then click **Publish**  
 	![](images/36.png)
 
-1. Go to Eclipse IDE 
-
-1. Expand the **root** module and double click on the *manifest.yml* file: this is the file which contains the information about how the Cloud Foundry application must be configured  
+1. A new line is added to the history on the right. Repeat this step several times, each time by changing the values for Soil\_pH and Soil\_Moisture in the  measures section of the JSON file  
 	![](images/37.png)
 
-1. As you can see, there is a line containing the following setting:
-
-	```yml
-  	random-route: true
-	```
-	
-	Replace this line with the following block; also replace the **\<NEW\_ROUTE\>** variable with the string you have got in the first step of this section
-	
-	```yml
-	routes:
-	- route: <NEW_ROUTE>
-	```
-	
-	![](images/38.png)
-	
-	>NOTE: Please pay particular attention to the formatting of this file because YML files are sensitive to the indentation.
-
-1. Save the file
-
-1. Go to SAP CP Cloud Foundry cockpit and **delete** the existing application  
+1. At the end you should have a history with several different publications  
 	![](images/39.png)
 
-1. Confirm the deletion  
+1. Congratulations! You have successfully sent sensor data/messages via MQTT using the Paho Client.
+
+
+
+### <a name="consuming-sensor-data"></a> Consuming and viewing sensor data
+This section explains various ways we can consume and visualize the measurements which are sent to IoT Cloud Gateway.
+
+1. Select your **gh_soil_device_XX** device in the cockpit, go to the **Data Visualization** tab, specify your Sensor - **gh_soil_sensor_XX**, a capability - **Soil_pH** and the property - **Soil_pH** you want to analyze (click on the **Refresh** button if neded). You should get a chart with all the data  
 	![](images/40.png)
 
-1. Check that you don't have any application in your space  
+1. Feel free to do the same for the **Soil_Moisture** capability  
 	![](images/41.png)
 
-1. Go back to your Terminal window and **push** the application again. The new route has been applied; you can check this from the "routes" variable  
-	![](images/42.png)
-
-1. You can now access your application through this new route. From this moment on, this will be your **\<APPLICATION\_URL\>**  
-	![](images/43.png)
-
-1. You have successfully replaced your random route with a fixed route.
-
+1. Congratulations! You have successfully consumed and analyzed sensor data.
 
 ## Summary
-This concludes the exercise. You should have learned how to install and configure Eclipse IDE in order to create a SAP S/4HANA Cloud SDK project for Cloud Foundry from a Maven archetype. You have also learned how to build the project with this new IDE and how to deploy the application to your Cloud Foundry environment. Please proceed with the next exercise.
+You have completed the exercise!
+
+You are now able to:
+
+* create a new Data Model using IoT Service Cockpit
+* onboard Devices with Gateway Cloud using MQTT protocol
+* send Data with Paho MQTT Client
+* view Data via IoT Service Cockpit
+
+
+Please proceed with next exercise.
