@@ -1,5 +1,5 @@
 # S4HC\_Leonardo\_PW2018
-S/4 HANA Cloud & Leonardo Powerweek 2018 - Exercises
+Build Innovative Extension Applications to SAP Solutions of S/4HANA Cloud with SAP Cloud Platform and SAP Leonardo Technologies Power Week 2018 - a technical hands-on workshop exercises
 
 
 # PREREQUISITES
@@ -9,6 +9,7 @@ S/4 HANA Cloud & Leonardo Powerweek 2018 - Exercises
 # INDEX OF EXERCISES 
 
 ### DAY 1
+Side-by-Side Extensions for S/4HANA Cloud
 
 - [Exercise\_11 - Building a project with the Neo archetype](Day1/Exercise_11/Exercise_11.md)
 - [Exercise\_12 - Building a project with CF archetype](Day1/Exercise_12/Exercise_12.md)
@@ -23,6 +24,7 @@ S/4 HANA Cloud & Leonardo Powerweek 2018 - Exercises
 
 
 ### DAY 2
+Leonardo Internet of Things Foundation
 
 - [(***WIP***) Exercise\_21 - Multitenant applications](Day2/Exercise_21/Exercise_21.md)
 - [(***WIP***) Exercise\_22 - End to End scenario using MQTT and Gateway Cloud](Exercise_22/Exercise_22.md)
@@ -30,6 +32,8 @@ S/4 HANA Cloud & Leonardo Powerweek 2018 - Exercises
 - [(***WIP***) Exercise\_24 - IoT Application Enablement](Exercise_24/Exercise_24.md)
 
 ### DAY 3
+Leonardo Machine Learning Foundation
+
 - [(***WIP***) Exercise\_31 - ML APIs Exploration](Day3/Exercise_31/Exercise_31.md)
 - [(***WIP***) Exercise\_32 - ML Use Case 1 - Pretrained service consumption](Day3/Exercise_32/Exercise_32.md)
 - [(***WIP***) Exercise\_33 - ML Foundation in SAP Cloud Foundry - Preparation](Day3/Exercise_33/Exercise_33.md)
