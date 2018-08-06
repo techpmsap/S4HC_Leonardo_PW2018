@@ -27,9 +27,9 @@ Side-by-Side Extensions for S/4HANA Cloud
 Leonardo Internet of Things Foundation
 
 - [(***WIP***) Exercise\_21 - Multitenant applications](Day2/Exercise_21/Exercise_21.md)
-- [(***WIP***) Exercise\_22 - End to End scenario using MQTT and Gateway Cloud](Exercise_22/Exercise_22.md)
-- [(***WIP***) Exercise\_23 - Maintenance Scenario using IoT to extend LoB](Exercise_23/Exercise_23.md)
-- [(***WIP***) Exercise\_24 - IoT Application Enablement](Exercise_24/Exercise_24.md)
+- [(***WIP***) Exercise\_22 - End to End scenario using MQTT and Gateway Cloud](Day2/Exercise_22/Exercise_22.md)
+- [(***WIP***) Exercise\_23 - Maintenance Scenario using IoT to extend LoB](Day2/Exercise_23/Exercise_23.md)
+- [(***WIP***) Exercise\_24 - IoT Application Enablement](Day2/Exercise_24/Exercise_24.md)
 
 ### DAY 3
 Leonardo Machine Learning Foundation
