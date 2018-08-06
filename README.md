@@ -1,5 +1,5 @@
 # S4HC\_Leonardo\_PW2018
-Build Innovative Extension Applications to SAP Solutions of S/4HANA Cloud with SAP Cloud Platform and SAP Leonardo Technologies Power Week 2018 - a technical hands-on workshop exercises
+Build innovative extension of S/4HANA Cloud with SAP Cloud Platform and SAP Leonardo Technologies Power Week 2018. These are technical hands-on workshop exercises.
 
 
 # PREREQUISITES
