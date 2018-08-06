@@ -1,11 +1,12 @@
 <table width=100% border=>
-<tr><td colspan=2><h1>EXERCISE 2_9 - VIRTUAL DATA MODEL(VDM)</h1></td></tr>
+<tr><td colspan=2><h1>EXERCISE 1_10 - DEVELOP A FRONT-END APPLICATION USING APPLICATION PROGRAMMING MODEL</h1></td></tr>
 <tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 min</h1></td></tr>
 </table>
 
 
 ## Description
-**This exercise is working in prgress**
+**This exercise is working in Progress**
+
 
 In this exercise, you’ll learn how to 
 
