@@ -55,7 +55,7 @@ As a first step we are going to create a project containing all the required art
 1. Enter the command
 
 	```sh
-	mvn archetype:generate -DarchetypeGroupId=com.sap.cloud.s4hana.archetypes -DarchetypeArtifactId=scp-neo-javaee7 -DarchetypeVersion=2.1.2
+	mvn archetype:generate -DarchetypeGroupId=com.sap.cloud.s4hana.archetypes -DarchetypeArtifactId=scp-neo-javaee7 -DarchetypeVersion=2.3.1
 	```
 
 1. This command is *interactive*, which means that during its execution you will receive some requests. In particular for this command you will have to enter the name of the project you want to create
