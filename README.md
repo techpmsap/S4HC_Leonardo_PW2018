@@ -24,10 +24,12 @@ Side-by-Side Extensions for S/4HANA Cloud
 
 ### DAY 2
 Continue Side-by-Side Extensions for S/4HANA Cloud  
-Leonardo Internet of Things Foundation
 
 - [(***WIP***) Exercise\_21 - Virtual Data Model (VDM)](Day2/Exercise_21/Exercise_21.md)
 - [(***WIP***) Exercise\_22 - Develop a front-end application using Application Programming Model](Day2/Exercise_110/Exercise_22.md)
+
+Leonardo Internet of Things Foundation
+
 - [(***WIP***) Exercise\_23 - Multitenant applications](Day2/Exercise_23/Exercise_23.md)
 - [(***WIP***) Exercise\_24 - End to End scenario using MQTT and Gateway Cloud](Day2/Exercise_24/Exercise_24.md)
 - [(***WIP***) Exercise\_25 - Maintenance Scenario using IoT to extend LoB](Day2/Exercise_25/Exercise_25.md)
