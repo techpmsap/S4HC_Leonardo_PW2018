@@ -1,257 +1,394 @@
 <table width=100% border=>
-<tr><td colspan=2><h1>EXERCISE 2_2 - IoT : End to End scenario using MQTT and Gateway Cloud</h1></td></tr>
-<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 mins</h1></td></tr>
+<tr><td colspan=2><h1>EXERCISE 2_2 - DEVELOP A FRONT-END APPLICATION USING APPLICATION PROGRAMMING MODEL</h1></td></tr>
+<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 min</h1></td></tr>
 </table>
 
 
 ## Description
-This document provides you with the steps for the hands-on session on SAP Cloud Platform Internet of Things. This scenario will help you to go through the following activities:
+**This exercise is working in Progress**
 
-* Creating Device Data Model in IoT Service Cockpit
-* Device onboarding on Gateway Cloud for MQTT protocol.
-* Sending Sensor Data from Paho MQTT Client
-* Consuming Data via IoT Service Cockpit
 
->NOTE: Use Google Chrome browser.
+In this exercise, you’ll learn how to 
+
+* introduce Virtual Data Model (VDM) into your application
+* create a frontend application with SAP Web IDE Full-Stack.
+
+The data stored in an S/4HANA system is inherently complexly structured and therefore difficult to query manually. For this reason, HANA introduced a Virtual Data Model (VDM) that aims to abstract from this complexity and provide data in a semantically meaningful and easy to consume way. The preferred way to consume data from an S/4HANA system is via the OData protocol. While BAPIs are also supported for compatibility reasons, OData should always be your first choice. You can find a list of all the available OData endpoints for S/4HANA Cloud systems in [SAP’s API Business Hub](https://api.sap.com/shell/discover/contentpackage/SAPS4HANACloud?section=ARTIFACTS).
+
+The S/4HANA Cloud SDK now brings the VDM for OData to the Java world to make the type-safe consumption of OData endpoints even more simple! The VDM is generated using the information from SAP’s API Business Hub. This means that it’s compatible with every API offered in the API Business Hub and therefore also compatible with every S/4HANA Cloud system.
+
+Looking at the code you wrote previously
+
+```java
+final List<BPDetails> businessPartners =
+    ODataQueryBuilder
+        .withEntity("/sap/opu/odata/sap/API_BUSINESS_PARTNER", "A_BusinessPartner")
+        .select("BusinessPartner", "BusinessPartnerName", "BusinessPartnerCategory", "BusinessPartnerGrouping", "LastName","FirstName")
+        .top(100)
+        .build()
+        .execute(getConfigContext())
+        .asList(BPDetails.class);
+```
+
+you can see that, in order to retrieve Business Partners, you already had to know three things:
+
+- the OData endpoints service path (`/sap/opu/odata/sap`)
+- the endpoints name (`API\_BUSINESS_PARTNER`)
+- the name of the entity collection (`A_BusinessPartner`) as defined in the endpoints metadata.
+
+Then, when you want to select specific attributes from the BusinessPartner entity with the **select()** function, you need to know how these fields are called. But since they are only represented as strings in this code, you need to look at the metadata to find out how they’re called. The same also applies for functions like orderBy() and filter(). And of course using strings as parameters is prone to spelling errors that your IDE most likely won’t be able to catch for you.
+
+Finally, you need to define a class such as `BPDetails` with specific annotations that represents the properties and their types of the result. For this you need again to know a lot of details about the OData service.
+
+Now, with **VDM**, it's all much easier!
+
+Using VDM you have access to an object representation of a specific OData service, in this case the `BusinessPartnerService`, so there’s no more need to know the endpoint’s service path, service name or entity collection name. We can call this service’s `getAllBusinessPartner()` function to retrieve a list of all the business partners from the system.
+
+Now take a look at the **select()** function. Instead of passing strings that represent the field of the entity, we can simply use the static fields provided by the BusinessPartner class. So not only we have eliminated the risk of spelling errors, we also made it type-safe! Again, the same applies for filter() and orderBy(). For example, filtering to a specific business partner category becomes as easy as `.filter(BusinessPartner.BUSINESS_PARTNER_CATEGORY.eq(bpCategory))`.
+
+An additional benefit of this approach is **discoverability**. Since everything is represented as code, you can simply use your IDE’s autocompletion features to see which functions a service supports and which fields an entity consists of: start by looking at the different services that are available in the package `com.sap.cloud.sdk.s4hana.datamodel.odata.services`, select the service you need, and then look for the static methods of the service class that represent the different available operations. Based on this, you can choose the fields to select and filters to apply using the fields of the return type.
+
+To sum up the advantages of the OData VDM:
+
+- No more hardcoded strings
+- No more spelling errors
+- Type safety for functions like filter, select and orderBy
+- Java data types for the result provided out of the box, including appropriate conversions
+- Discoverability by autocompletion
+- Currently the VDM supports retrieving entities by key and retrieving lists of entites along with filter(), select(), orderBy(), top() and skip(). You can also resolve navigation properties on demand and use function imports. Future releases will bring even more enhancements to its functionality.
+
+For further reading on SAP S/4HANA Cloud SDK, click link below.
+<https://www.sap.com/germany/developer/topics/s4hana-cloud-sdk.html>
 
 
 ## Target group
 
 * Developers
-* People interested in SAP Leonardo and IoT
+* People interested in learning about S/4HANA extension and SDK  
 
 
 ## Goal
 
-The goal of this exercise is to create a new device data model in the IoT Service cockpit, to onboard a new device with a sensor with SAP Gateway Cloud for MQTT protocol, to send data with Paho MQTT Client and finally to consume them via IoT Service Cockpit
-
-
+The goal of this exercise is to create a frontend application for your service which uses Virtual Data Model(VDM).  
 
 ## Prerequisites
+  
+Here below are prerequisites for this exercise.
 
-Below are some of the prerequisites for this exercise.
-
-* A Remote Desktop Connection app. Credentials to logon will be provided by your instructor
-* An SAP IoT Service cockpit system with user credentials which will be provided by your instructor
+* A trial account on the SAP Cloud Platform. You can get one by registering [here](https://account.hanatrial.ondemand.com)
+* Apache Maven 3.3.9+ [download it here](https://maven.apache.org/download.cgi)
+* Java JDK 8
+* Cloud Foundry CLI [download it here](https://github.com/cloudfoundry/cli)
+* The source code created in the previous exercise
+* A S/4HANA system with a working communication arrangement for the Business Partners collection
 
 
 ## Steps
 
-1. [Introduction](#introduction)
-1. [Creating device data model](#creating-device-data-model)
-1. [Device and sensor onboarding](#device-and-sensor-onboarding)
-1. [Sending messages via MQTT using Paho client](#mqtt-Paho)
-1. [Consuming and viewing sensor data](#consuming-sensor-data)
+1. [Implement VDM](#implement-vdm)
+1. [Build frontend application with SAP Web IDE](#frontend-application)
 
 
+### <a name="implement-vdm"></a>Implement VDM
+In this chapter you are going to see how to implement Virtual Data Model in your application. Specifically, you are going to change the two latest classes introduced after implementing caching and resilience, **GetCachedBPCommand** and **GetCachedBPByCategoryCommand**.
 
-### <a name="introduction"></a> Introduction
-The SAP Cloud Platform Internet of Things Service enables customers and partners to develop, customize, and operate IoT business applications in the cloud. SAP CP IoT Service provides Lifecycle management at scale for IoT devices from onboarding to decommissioning. It also provides a way to securely connect to remote devices over a broad variety of IoT protocols. It provides gateway Edge which provides on-premise IoT edge processing and also gateway cloud which does centralized cloud based processing. The **IoT cockpit** is the user interface of the solution and provides access to various functions. It is the main user interface for users to interact with the Internet of Things core service. It can be used for creating users and tenants, for creating device data models, for device onboarding and decomissioning, for adding new networks and to visualize the data which are being ingested via IoT devices/sensors.  
+1. Let's start with **GetCachedBPCommand**. Open this class and add a couple of new imports to the class
+
+	```java
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
+	```
+
 	![](images/01.png)
 
+1. Replace the line
 
+	```java
+	final List<BPDetails> businessPartners =
+	    ODataQueryBuilder
+	        .withEntity("/sap/opu/odata/sap/API_BUSINESS_PARTNER", "A_BusinessPartner")
+	        .select("BusinessPartner", "BusinessPartnerName", "BusinessPartnerCategory", "BusinessPartnerGrouping", "LastName","FirstName")
+	        .top(100)
+	        .build()
+	        .execute(getConfigContext())
+	        .asList(BPDetails.class);
+	```
+	
+1. with the following:
 
-### <a name="creating-device-data-model"></a> Creating device data model
-Centralized Device data model provides the schema of device related configurations including the data fields that will be exchanged. In order to send data to the IoT service a device data model is required. The device entity must have at least one sensor assigned to it. In case, no sensor is created beforehand a Sensor will be automatically created during data ingestion (default behavior). A new sensor type can be added with capabilities(measures/commands). A capability can be reused since it can be assigned to multiple sensor types and each capability can have one or many properties. 
-In the section below, using the IoT Service Cockpit, initially two capabilities("Soil pH and Moisture") are created, then a sensor type is created and the capabilities are assigned to it. A device is then created and will have one sensor, which is of the custom sensor type.
-
-1.	Open the browser and navigate to the IoT Service Cockpit URL and log on with the tenant user credentials, provided by the instructor  
+	```java
+	final  List<BusinessPartner> businessPartners = new DefaultBusinessPartnerService().getAllBusinessPartner()
+	        .select(BusinessPartner.BUSINESS_PARTNER,
+	                BusinessPartner.BUSINESS_PARTNER_NAME,
+	                BusinessPartner.BUSINESS_PARTNER_CATEGORY,
+	                BusinessPartner.BUSINESS_PARTNER_GROUPING,
+	                BusinessPartner.LAST_NAME,
+	                BusinessPartner.FIRST_NAME)
+	        .top(100)
+	        .execute(getConfigContext());
+	```
+  
 	![](images/02.png)
 
-1.	Use the main menu to navigate to the **Device Management** -> **Capabilities** section and click on the **"+"** sign, to add first capability Soil pH  
+1. Of course, doing this you introduced some errors in the code. No worries!. You just need to replace all the **BPDetails** references (5 matches) with **BusinessPartner**, because now we are no longer using the BPDetails class we have defined, but the predefined one coming from the VDM. Go to the **Edit->Find/Replace** menu, enter "BPDetails" in the find box and "BusinessPartner" in the replace box and click **Replace all**. You should have just 5 matches   
 	![](images/03.png)
 
-1. In the **General information** section enter **Name** as **Soil_pH** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
-
-	| Parameter | Value    |
-	| --------- | -------- |
-	| Name | Soil\_pH     |
-	| Data Type | float    |
-	| Unit Of Measure | pH |
-
+1. Feel free to remove the **OdataQueryBuilder** import from the class because it's no longer needed; then **save** the file   
 	![](images/04.png)
 
-1. Once again navigate to **Capabilities** section and click on the "**+**" sign to add the second capability Soil_Moisture.  
-	![](images/05.png)   
+1. This is the final code for this class
+	![](images/05.png)
 
-1. In the **General information** section enter **Name** as **Soil_Moisture** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
-
-	| Parameter | Value      |
-	| --------- | ---------- |
-	| Name | Soil\_Moisture |
-	| Data Type | float      |
-	| Unit Of Measure | %    |
+1. The same changes must be done to the second class **GetCachedBPByCategoryCommand**. The only difference here is that here we need also to introduce a line for filtering all the Business Partners by the passed category `.filter(BusinessPartner.BUSINESS_PARTNER_CATEGORY.eq(bpCategory))`. You can delete the unused imports related to ODataProperty, ODataQueryBuilder, ODataType. This is the final code of this class  
 
 	![](images/06.png)
 
-1. Navigate to **Device Management** -> **Sensor Types** and click on the "**+**" sign to add a sensor type for the Soil Sensor   
+1. Finally, the **BPServlet** class must be changed accordingly as well. First add this new import to the file
+
+	```java
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	```  
+
+	![](images/07.png)
+
+1. Then change this line 
+
+	```java
+	final List<BPDetails> result;
+	```
+with the following and **save** the file
+
+	```java
+	final List<BusinessPartner> result;
+	```
+  
+	![](images/08.png)
+
+1. This is the final version of this class 
 	![](images/09.png)
 
-1. In the **General information** section enter **Name** as **gh_soil_sensor_typ_XX**, where **XX** is your workstation ID and in the **Capabilities** section enter and add the earlier created capabilities
-
-	| Capability | Type       |
-	| --------- | ----------- |
-	| Soil_pH | measure       |
-	| Soil_Moisture | measure |
-
+1. There are no more syntax errors now, but if you try to build the project with Maven as it is, you will get some errors in the test phase  
 	![](images/10.png)
+
+1. So we need to adjust the tests as well, because they are no longer aligned with the latest changes. Go to */integration-tests/src/test/resources/businesspartners-schema.json*  
 	![](images/11.png)
 
-	Click on **Create**. Ensure the Sensor Type is created successfully
-
-1. Congratulations! You have successfully created a new data model.
-
-### <a name="device-and-sensor-onboarding"></a> Device and sensor onboarding
-Each device exchanges data with a specific protocol (for example: MQTT in this exercise).  Each device corresponds to 1 unique physical device. We need to create a device that corresponds to a physical device. In the following section, it is described how to create a Device for the MQTT network. Also we onboard the sensor for the Device.
-
-1.	Use the main menu to navigate to **Device Management** -> **Devices** section and click on the "**+**" sign to start the device creation process
-
-	>NOTE: As an alternative, devices and sensors can also be created via APIs. In this exercise, we will create it via UI cockpit  
-
-	![](images/12.png)
-
-1.	In the **General Information** section, enter the following information and click on **Create**
-
-	| Parameter | Value |
-	| --------- |----- |
-	| Name | gh_soil_device_XX |
-	| Gateway |MQTT Network |
-	| Alternate ID | \<leave it blank\> |
-
-	>NOTE: Ignore the Alternate ID as it's optional and is filled on Create. This would be required at later steps to be provided in Paho Client as well    
-
-	![](images/13.png)
-
-1.	In the new device, Sensor tab click on the "**+**" sign to create a new sensor  
-	![](images/14.png)
-
-1.	In the General Information section, enter a name such as "**gh_soil_sensor_XX**", replace XX for your workstation ID, select Sensor Type you have created earlier (i.e. gh_soil_sensor_typ_XX, where **XX** must be replaced with your workstation ID) and ignore the Alternate ID as it's optional. This Soil\_Sensor automatically provides Soil\_pH, Soil\_Moisture: these are the capabilities we have previously defined. Once done click on **Add**  
-	![](images/15.png)
-
-1.	The new sensor is created and you should be able to see the **gh_soil_sensor_XX** under the **Sensors** tab of the gh_soil_device_XX device onboarded earlier  
-	![](images/16.png)
-
-1. Be sure that your gh_soil_device_XX device is selected, choose the **Certificate** tab and click on **Generate Certificate**  
-	![](images/17.png)
-
-1. Choose the Certificate Type **P12** and click **Generate**  
-	![](images/18.png)
-
-1. This will trigger a popup window providing you with a secret key which you must copy and save in notepad. Then click **OK**  
-	![](images/19.png)
-
-1. You can also see the downloaded certificate *Paho\_Client\_XX-device\_certificate.p12* in the Chrome browser status bar. Click on the small down arrow and choose **Show in folder**  
-	![](images/20.png)
-
-
-1. This will make you understand where the certificate is located. Please keep in mind this location since it will be used in the next section  
-	![](images/20a.png)
-
-1. Congratulations! You have successfully onboarded a new device and a new sensor.
-
-
-### <a name="mqtt-Paho"></a> Sending messages via MQTT using Paho client
-In this step, we will send the data from Device Simulator that supports MQTT protocol. We have already on-boarded this simulator device during previous steps. Once we send the data, it would be received by Internet of Things Gateway Cloud and would be visible in the IoT services cockpit and via APIs.
-
-1.	Launch the **MQTT Paho Client**, it should be located under the *C:\Student\PahoClient* folder  
-	![](images/21.png)
-
-1. 	Click on **Run** in case you get a security warning  
-	![](images/22.png)
-
-1.	Click on the "**+**" sign to create a new connection  
-	![](images/23.png)
-
-1.	Configure the **MQTT** tab of **connection1** with this information
-
-	| Parameter | Value |
-	| --------- | ----- |
-	| Server URI | `ssl://<host_name>:8883` where **\<host\_name\>** is the host part in the cockpit  URL |
-	| Client ID | The AlternateID of the Device gh_soil_device_XX |
-
-	![](images/24.png)
-
-1.	Click on **OPTIONS** tab, select **Enable SSL** and click on the first **Browse...** button to specify the Key Store Location  
-	![](images/25.png)
-
-1.	Change the file extension search criteria to \*.p12 and browse for the *Paho\_Client\_XX-device\_certificate.p12* you have downloaded from IoT Service Cockpit  
-	![](images/26.png)
-
-1. 	As Key Store Password, specify the client secret you had copied in your notepad. Then click on the second **Browse...** button to locate the Trust Store repository  
-	![](images/27.png)
-
-1. Change the file extension search criteria from \*.jks to \*.\* and go to the folder *\<JRE\_Installation\_Folder\>\jre\lib\security*, in your case it should be *C:\Program Files\Java\jre1.8.0_161\lib\security*. Once there, select the file *cacerts* and click **Open**  
-	![](images/28.png)
-
-1. 	As Trust Store password, simply use the text "**changeit**"  
-	![](images/29.png)
-
-1.	Go to the **MQTT** tab and click on **Connect**  
-	![](images/30.png)
-
-1.	Status should turn to **Connected** as shown in the picture  
-	![](images/31.png)
-
-1.	In the **Publish** section, enter the topic `measures/<alternate_id>` replacing `alternate_id` with the **Alternate ID** of the device  
-	![](images/32.png)
-
-1. 	Use the default settings for **QOS**
-
-1. Copy the following JSON script and paste it in a text editor
+1. There are a few things to change here. First of all we beed to replace the **javaType** with `com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.BusinessPartnerNamespace.BusinessPartner`. Then we need to change the names of the required fields, because they are now coming directly from the BusinessPartnerService and are different. This is the final file
 
 	```json
 	{
-	"capabilityAlternateId":[
-		"<<< Soil_pH Capability Alternate ID >>>",
-		"<<< Soil_Moisture Capability Alternate ID >>>"
-		],
-	"measures":[7,35],
-	"sensorAlternateId":"<<< Sensor Alternate ID >>>"
+	  "$schema": "http://json-schema.org/draft-04/schema#",
+	  "title": "Business Partners List",
+	  "type": "array",
+	  "items": {
+	    "title": "Business Partner Item",
+	    "type": "object",
+	    "javaType": "com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner",
+	    "required": ["BusinessPartner", "BusinessPartnerName"]
+	  }
 	}
+	```  
+	![](images/12.png)
+
+1. Save the file and rebuild the root project again. It should end with a success  
+	![](images/13.png)
+
+1. Push the application again with the `cf push` command  
+	![](images/14.png)
+
+1. The application should be still working fine. 
+	>NOTE: now the field names are different beacuse we are using VDM, taking the output coming directly from the BusinessPartnerService    
+
+	![](images/15.png)
+
+1. You have successfully implemented VDM in your application.
+
+
+### <a name="frontend-application"></a>Build frontend application with SAP Web IDE
+In this chapter you are going to see how to use SAP Web IDE to build a very basic SAPUI5 application consuming the simple REST service we have implemented with this application. 
+
+1. Before we continue, since you have some space limitations on your SAP Cloud Foundry Trial Landscape, make sure to completely delete the two applications you have just pushed into your space with the `cf push` command. This because we need to make some room for the Cloud Foundry builder which is a little heavy in terms of memory and disk space
+	![](images/15_2.png)
+
+1. Login with your "developerXX" account (where **XX** must be replaced by your workstation ID) to the S/4HANA Cloud Launchpad through the link provided by your instructor 
+	![](images/16.png)
+
+1. Once on the Launchpad, switch to the **Extensibility** tab and click on the tile named **SAP Web IDE**  	![](images/17.png)
+
+1. You will be requested to login again: use the same "developerXX" account  
+	![](images/18.png)
+
+1. In SAP Web IDE, click on the **Developer** tab  
+	![](images/19.png)
+
+1. From the top menu choose **File -> New -> Project from template**  
+	![](images/20.png)
+
+1. Select the **Multi-Target Application** template and click **Next**  
+	![](images/21.png)
+
+1. Enter **bpr\_frontend\_project** as the name of the project and click **Next**  
+	![](images/22.png)
+
+1. Keep both Application ID and version as proposed. Then click **Finish**  
+	![](images/23.png)
+
+1. Once the project is created, right click on the project's name and select **New -> HTML5 Module**   
+	![](images/24.png)
+
+1. Select the **Featured** category, choose the **SAPUI5 Application** template and click **Next**  
+	![](images/25.png)
+
+1. Enter **bpfrontend** as Module Name and **com.sap.sample** as Namespace and click **Next**      
+	![](images/26.png)
+
+1. Keep the proposed values in the screen and click **Finish**    
+	![](images/27.png)
+
+1. Once the module is created, you can run the module to check that it's working. Expand the module and locate the file *index.html*; then click on the **play** button on the top toolbar  
+	![](images/28.png)
+
+1. The web preview is shown, but at moment it's just a blank screen  
+	![](images/29.png)
+
+1. You can close the Web Preview  
+	![](images/30.png)
+
+1. Double click on the *view/View1.view.xml* file, replace the "**content**" tags with the following code and save the file. If you want you can also "beautify" your code by clicking on the **Edit->Beautify** menu. Wehn finished **save** the file
+
+	```xml
+	<content>
+		<!-- Add this between the content tags -->
+	    <List headerText="Business Partners"
+			items="{businessPartner>/}" >
+			<StandardListItem
+				title="{businessPartner>BusinessPartnerName}"
+				description="{businessPartner>BusinessPartner}" />
+		</List>
+	</content>
+	```
+  
+	![](images/31.png)
+
+1. Next, double click on the *controller/View1.controller.js* file and replace the entire content with the following code, then **save** the file
+
+	```javascript
+	sap.ui.define([
+		"sap/ui/core/mvc/Controller",
+		"sap/ui/model/json/JSONModel"
+	], function(Controller, JSONModel) {
+		"use strict";
+	
+		return Controller.extend("com.sap.sample.bpfrontend.controller.View1", {
+			onInit: function() {
+				var view = this.getView();
+	
+				jQuery.get("/businesspartners")
+					.done(function(data) {
+						var model = new JSONModel(data);
+						view.setModel(model, "businessPartner");
+					});
+			}
+	
+		});
+	});
 	```
 
-1. Replace the **<<< Sensor Alternate ID >>>** with the **Alternate ID** you can read by going on your **gh_soil_sensor_XX** in your **gh_soil_device_XX** device  
+	![](images/32.png)
+
+1. If you run again your application you get an empty list where you can see just the "Business Partners" header. You can close this preview page for the moment  
 	![](images/33.png)
 
-1. Then go to **Sensor Types** -> **gh_soil_sensor_typ_XX**  
+1. Double click on the *mta.yaml* file in the project explorer on the left and when the file opens on the right hand side, switch to the **Code Editor** tab  
 	![](images/34.png)
 
-1. Replace the **<<< Soil_pH Alternate ID >>>** with the Alternate ID of the Soil_pH capability  
+1. Let's adjust a little bit the quotas of this application as well: double click on the *mta.yaml* file, change both the **disk-quota** and **memory** parameters to **128M**. Then 
+	- replace the **name** module with "bpfrontend-developerxx", where **xx** is your workstation ID
+	- add a new parameter named "**host**" with the value of "bpfrontend-developerxx" as well
+	- Finally save and close the file
+
 	![](images/35.png)
 
-1. Repeat the previous 2 steps for the other capability (Soil_Moisture). At the end copy the JSON script you have created and paste it in the Message text area of your Paho Client. Then click **Publish**  
+1. Now before we can build this project, we need to install the builder which knows how to deal and build MTA applications. Click the **Preferences** gear on the left side toolbar. Select **Cloud Foundry** and click the dropdown list to choose the CF API Endpoint  
 	![](images/36.png)
 
-1. A new line is added to the history on the right. Repeat this step several times, each time by changing the values for Soil\_pH and Soil\_Moisture in the  measures section of the JSON file  
+1. Enter your SAP Cloud Platform Trial Landscape account and click **Log On**  
 	![](images/37.png)
 
-1. At the end you should have a history with several different publications  
+1. Specify the correct CF API Endpoint where you are going to deploy your application; choose as well the Organization and the Space (they should come filled automatically) and finally click on **Install Builder**  
+	![](images/38.png)
+
+1. After a few minutes, the builder gets installed and you receive the message "The builder in your space is up to date". Click on **Save** and close this page. Actually, if you open your SAP CP Cloud Foundry cockpit you will see that there is a new application in the list: this is the **MTA builder** 
 	![](images/39.png)
 
-1. Congratulations! You have successfully sent sensor data/messages via MQTT using the Paho Client.
-
-
-
-### <a name="consuming-sensor-data"></a> Consuming and viewing sensor data
-This section explains various ways we can consume and visualize the measurements which are sent to IoT Cloud Gateway.
-
-1. Select your **gh_soil_device_XX** device in the cockpit, go to the **Data Visualization** tab, specify your Sensor - **gh_soil_sensor_XX**, a capability - **Soil_pH** and the property - **Soil_pH** you want to analyze (click on the **Refresh** button if neded). You should get a chart with all the data  
+1. Switch the Console View on by clicking on the small console icon on the bottom right hand side  
 	![](images/40.png)
 
-1. Feel free to do the same for the **Soil_Moisture** capability  
+1. Right click on the project name and choose **Build**  
+	![](images/40_2.png)
+
+1. After some time the build process should finish successfully  
 	![](images/41.png)
 
-1. Congratulations! You have successfully consumed and analyzed sensor data.
+1. Right click on the Workspace folder choose **Refresh Workspace Items**  
+	![](images/42.png)
+
+1. If you look Project Explorer in SAP Web IDE, you will find a new folder named *mta_archives*. Inside this folder you will find a subfolder named as your MTA project containing a *.mtar* file  
+	![](images/43.png)
+
+1. Before we can deploy this file to Cloud Foundry, since we are on the Trial Landscape and we have only 2GB of available space, we need to gain some space. We can do it, by simply deleting the MTA builder which will be no longer used in this exercise. Go to your SAP CP Cloud Foundry cockpit and delete the MTA builder application  
+	![](images/44.png)
+
+1. Go back to SAP Web IDE Full-Stack, right click on the *.mtar* file in the *mta_archives* folder and choose **Deploy -> Deploy to Cloud Foundry**  
+	![](images/45.png)
+
+1. Specify the right Cloud Foudry API Endpoint, the Organization and the Space and click **Deploy**  
+	![](images/46.png)
+
+1. When the deployment finishes you get a small alert on the top right corner of your SAP Web IDE Full-Stack. 
+	![](images/47.png)
+
+1. At the same time, looking at your SAP CP Cloud Foundry cockpit a new application has been pushed: this is your frontend application  
+	![](images/48.png)
+
+1. Before you can test your frontend application, you still need to make a couple of changes to the **Approuter** and push it again. Go to Eclipse IDE and open the **scpsecurity** project. Double click on the *manifest.yml* file and change the **env** section in this way. We are adding a new destination to the file. Don't forget to 
+	- replace the **\<APPLICATION\_NAME\>** with your application's name
+	- replace the **xx** characters with your workstation ID
+	- save the file
+
+	```xml
+  env:
+    TENANT_HOST_PATTERN: 'approuter-(.*).cfapps.eu10.hana.ondemand.com'
+    destinations: '[
+    {"name":"bp-api", "url" :"https://<APPLICATION_NAME>.cfapps.eu10.hana.ondemand.com", "forwardAuthToken": true},
+    {"name":"bp-frontend", "url" :"https://bpfrontend-developerxx.cfapps.eu10.hana.ondemand.com", "forwardAuthToken": true}
+    ]'
+	```  
+	![](images/49.png)
+
+1. Double click on the *xs-app.json* file in the approuter folder and change it in this way. Save the file
+
+	```json
+	{ "welcomeFile": "/bpfrontend/index.html",
+	  "routes": [{
+	    "source": "^/businesspartners",
+	    "destination": "bp-api"
+	  }, {
+	    "source": "/",
+	    "destination": "bp-frontend"
+	  }]
+	}
+	``` 
+	![](images/50.png)
+
+1. Deploy the **approuter** application again with `cf push`
+
+1. Deploy your Business Partner service application again with `cf push`
+
+1. Now if you open the browser on the link <https://approuter-\<your_account\>.cfapps.eu10.hana.ondemand.com>, where \<your\_account\> is your CF account, you are requested to enter the credentials again. Do it and you will be brought to the application's page  
+	![](images/51.png)
+
+1. Congratulations! You have successfully created a frontend application for your service.
 
 ## Summary
-You have completed the exercise!
-
-You are now able to:
-
-* create a new Data Model using IoT Service Cockpit
-* onboard Devices with Gateway Cloud using MQTT protocol
-* send Data with Paho MQTT Client
-* view Data via IoT Service Cockpit
-
-
-Please proceed with next exercise.
+This concludes the exercise. You should have learned how to introduce Virtual Data Model in your service and how to build a SAPUI5 frontend application on top of it using SAP Web IDE Full-Stack. Please proceed with the next exercise.

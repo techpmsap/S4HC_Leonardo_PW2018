@@ -1,22 +1,63 @@
 <table width=100% border=>
-<tr><td colspan=2><h1>EXERCISE 2_1 - MULTI-TENANT APPLICATIONS</h1></td></tr>
+<tr><td colspan=2><h1>EXERCISE 2_1 - VIRTUAL DATA MODEL(VDM)</h1></td></tr>
 <tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 min</h1></td></tr>
 </table>
 
 
 ## Description
-In this exercise, you’ll learn how connectivity service resolves destination visibility for extension apps, how to protect multitenancy application by roles, how it works during multitenancy scenario and how to use tenant aware API’s during development of multitenant application.  
+**This exercise is working in prgress**
 
-The output of the application displays a welcome page showing the URI of the tenant-specific details, destination configuration and user details. It also shows, how users of the consumer subaccount, which is subscribed to this application, can access the application using a tenant-specific URL and how manage role and identity management with regard to consumer subaccount.
+In this exercise, you’ll learn how to 
 
-> NOTE: - Idea of this hands-on exercise is to illustrate the concept which can be applied when developing SuccessFactors extension application. As we are not leveraging roles, users from SuccessFactors instance for this hands-on exercise for the sake of simplicity.
+* introduce Virtual Data Model (VDM) into your application
+* create a frontend application with SAP Web IDE Full-Stack.
 
-* Set up of Eclipse with SAP Cloud Platform plugins 
-* SAP Cloud Platform Extension account access
+The data stored in an S/4HANA system is inherently complexly structured and therefore difficult to query manually. For this reason, HANA introduced a Virtual Data Model (VDM) that aims to abstract from this complexity and provide data in a semantically meaningful and easy to consume way. The preferred way to consume data from an S/4HANA system is via the OData protocol. While BAPIs are also supported for compatibility reasons, OData should always be your first choice. You can find a list of all the available OData endpoints for S/4HANA Cloud systems in [SAP’s API Business Hub](https://api.sap.com/shell/discover/contentpackage/SAPS4HANACloud?section=ARTIFACTS).
 
-Refer to this blog to deep dive into multitenancy application development  
-<https://blogs.sap.com/2016/11/09/developing-multi-tenant-applications-on-the-sap-hana-cloud-platform/>
+The S/4HANA Cloud SDK now brings the VDM for OData to the Java world to make the type-safe consumption of OData endpoints even more simple! The VDM is generated using the information from SAP’s API Business Hub. This means that it’s compatible with every API offered in the API Business Hub and therefore also compatible with every S/4HANA Cloud system.
 
+Looking at the code you wrote previously
+
+```java
+final List<BPDetails> businessPartners =
+    ODataQueryBuilder
+        .withEntity("/sap/opu/odata/sap/API_BUSINESS_PARTNER", "A_BusinessPartner")
+        .select("BusinessPartner", "BusinessPartnerName", "BusinessPartnerCategory", "BusinessPartnerGrouping", "LastName","FirstName")
+        .top(100)
+        .build()
+        .execute(getConfigContext())
+        .asList(BPDetails.class);
+```
+
+you can see that, in order to retrieve Business Partners, you already had to know three things:
+
+- the OData endpoints service path (`/sap/opu/odata/sap`)
+- the endpoints name (`API\_BUSINESS_PARTNER`)
+- the name of the entity collection (`A_BusinessPartner`) as defined in the endpoints metadata.
+
+Then, when you want to select specific attributes from the BusinessPartner entity with the **select()** function, you need to know how these fields are called. But since they are only represented as strings in this code, you need to look at the metadata to find out how they’re called. The same also applies for functions like orderBy() and filter(). And of course using strings as parameters is prone to spelling errors that your IDE most likely won’t be able to catch for you.
+
+Finally, you need to define a class such as `BPDetails` with specific annotations that represents the properties and their types of the result. For this you need again to know a lot of details about the OData service.
+
+Now, with **VDM**, it's all much easier!
+
+Using VDM you have access to an object representation of a specific OData service, in this case the `BusinessPartnerService`, so there’s no more need to know the endpoint’s service path, service name or entity collection name. We can call this service’s `getAllBusinessPartner()` function to retrieve a list of all the business partners from the system.
+
+Now take a look at the **select()** function. Instead of passing strings that represent the field of the entity, we can simply use the static fields provided by the BusinessPartner class. So not only we have eliminated the risk of spelling errors, we also made it type-safe! Again, the same applies for filter() and orderBy(). For example, filtering to a specific business partner category becomes as easy as `.filter(BusinessPartner.BUSINESS_PARTNER_CATEGORY.eq(bpCategory))`.
+
+An additional benefit of this approach is **discoverability**. Since everything is represented as code, you can simply use your IDE’s autocompletion features to see which functions a service supports and which fields an entity consists of: start by looking at the different services that are available in the package `com.sap.cloud.sdk.s4hana.datamodel.odata.services`, select the service you need, and then look for the static methods of the service class that represent the different available operations. Based on this, you can choose the fields to select and filters to apply using the fields of the return type.
+
+To sum up the advantages of the OData VDM:
+
+- No more hardcoded strings
+- No more spelling errors
+- Type safety for functions like filter, select and orderBy
+- Java data types for the result provided out of the box, including appropriate conversions
+- Discoverability by autocompletion
+- Currently the VDM supports retrieving entities by key and retrieving lists of entites along with filter(), select(), orderBy(), top() and skip(). You can also resolve navigation properties on demand and use function imports. Future releases will bring even more enhancements to its functionality.
+
+For further reading on SAP S/4HANA Cloud SDK, click link below.
+<https://www.sap.com/germany/developer/topics/s4hana-cloud-sdk.html>
 
 
 ## Target group
@@ -27,295 +68,326 @@ Refer to this blog to deep dive into multitenancy application development
 
 ## Goal
 
-The goal of this exercise is to unerstand how to use tenant and user API connectivity service with Multi-Tenant Applications.  
+The goal of this exercise is to create a frontend application for your service which uses Virtual Data Model(VDM).  
 
 ## Prerequisites
   
 Here below are prerequisites for this exercise.
 
-* SAP Cloud Platform account
-* Java / Eclipse IDE
+* A trial account on the SAP Cloud Platform. You can get one by registering [here](https://account.hanatrial.ondemand.com)
+* Apache Maven 3.3.9+ [download it here](https://maven.apache.org/download.cgi)
+* Java JDK 8
+* Cloud Foundry CLI [download it here](https://github.com/cloudfoundry/cli)
+* The source code created in the previous exercise
+* A S/4HANA system with a working communication arrangement for the Business Partners collection
 
 
 ## Steps
 
-1. [Overview](#overview)
-1. [Create sample servlet](#create-sample-servlet)
-1. [Test the application on your local Tomcat web server](#test-locally)
-1. [Let’s deploy application to SAP Cloud Platform](#deploy-to-sap-cp)
-1. [Let’s subscribe to sample java apps from the provider account](#subscribe-to-java-apps)
+1. [Implement VDM](#implement-vdm)
+1. [Build frontend application with SAP Web IDE](#frontend-application)
 
 
-### <a name="overview"></a>Overview
-Multitenant applications that require connection to a remote service can use the connectivity service to configure HTTP or RFC endpoints. In a provider-managed application, such an endpoint can either be once defined by the application provider or by each application consumer. If the application needs to use the same endpoint, independently from the current application consumer, the destination that contains the endpoint configuration is uploaded by the application provider. If the endpoint should be different for each application consumer, the destination shall be uploaded by each application consumer.
-Destinations can be simultaneously configured on three levels: 
+### <a name="implement-vdm"></a>Implement VDM
+In this chapter you are going to see how to implement Virtual Data Model in your application. Specifically, you are going to change the two latest classes introduced after implementing caching and resilience, **GetCachedBPCommand** and **GetCachedBPByCategoryCommand**.
 
-- application
-- consumer subaccount
-- subscription
+1. Let's start with **GetCachedBPCommand**. Open this class and add a couple of new imports to the class
 
-This means it is possible to have one and the same destination on more than one configuration level. 
-Destinations visibility according to the level is
+	```java
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
+	```
 
-- **destination uploaded on consumer subaccount level** - it is visible for the whole subaccount
-- **destination uploaded on consumer subscription level** - it is only visible for the dedicated subscription
-- **destination uploaded on provider application level** - it is visible by all tenants and subaccounts, regardless their permission settings.
+	![](images/01.png)
 
-<u>When the application accesses the destination at runtime, the connectivity service tries to first lookup the requested destination in the consumer subaccount on subscription level. If no destination is available there, it checks if the destination is available on the subaccount level of the consumer subaccount. If there is still no destination found, the connectivity service searches on application level of the provider subaccount.</u>
-![](images/01.png)
+1. Replace the line
 
+	```java
+	final List<BPDetails> businessPartners =
+	    ODataQueryBuilder
+	        .withEntity("/sap/opu/odata/sap/API_BUSINESS_PARTNER", "A_BusinessPartner")
+	        .select("BusinessPartner", "BusinessPartnerName", "BusinessPartnerCategory", "BusinessPartnerGrouping", "LastName","FirstName")
+	        .top(100)
+	        .build()
+	        .execute(getConfigContext())
+	        .asList(BPDetails.class);
+	```
+	
+1. with the following:
 
-### <a name="create-sample-servlet"></a>Create sample servlet
-Let’s first create sample servlet application to test connectivity service functionality.
-
-1. Open your Eclipse IDE and switch to the **Java EE** perspective  
-![](images/02.png)
-1.	Download the [multitenant.zip](files/multitenant.zip) file and extract it into a folder on your workstation
-1.	Go to **File->Import->Maven->Existing Maven Project** and click on **Next**  
-![](images/03.png)
-1.	Browse for the path to the folder where you extracted the *multitenant.zip* file, check that the *pom.xml* file is selected and click on **Finish**. Maven project is getting imported into local workspace  
-	![](images/04.png)
-1. Right click on the project name and choose **Refactor->Rename**. Since all the attendees to this workshop will be deploying applications to a shared SAP Cloud Platform account, they need to have different application names  
-	![](images/05.png)
-	> NOTE: Refactor renames the selected element and (if enabled) corrects all references to the elements (also in other files).
-
-1. Give a project unique name like **multitenant\<XX\>**, where **\<XX\>** is the **workstation ID** assigned by your instructor  
-	![](images/06.png)
-1. If you see errors after refactoring, right click on the project and choose **Maven->Update Project**  
-	![](images/07.png)
-1.	Click on **OK**  
-	![](images/09.png)
-1.	Right click again on the project and select **Run As->Maven Build**  
-	![](images/08.png)
-1.	Edit the **Goals** by entering `clean install` and click **Run**  
-	![](images/10.png)
-	> NOTE: This command tells Maven to build all the modules and to create a *target* folder where the built ones are copied.
-
-1.	Check that you got BUILD SUCCESS status in the Console view  	![](images/11.png)
-
-
-### <a name="test-locally"></a>Test the application on your local Tomcat web server
-The application has been built: you can just test it on your local Tomcat web server. In this step, we will be enhancing previously created sample extension app to add more logic to invoke tenant context API’s, user API, protect apps by role and finally test connectivity service.
+	```java
+	final  List<BusinessPartner> businessPartners = new DefaultBusinessPartnerService().getAllBusinessPartner()
+	        .select(BusinessPartner.BUSINESS_PARTNER,
+	                BusinessPartner.BUSINESS_PARTNER_NAME,
+	                BusinessPartner.BUSINESS_PARTNER_CATEGORY,
+	                BusinessPartner.BUSINESS_PARTNER_GROUPING,
+	                BusinessPartner.LAST_NAME,
+	                BusinessPartner.FIRST_NAME)
+	        .top(100)
+	        .execute(getConfigContext());
+	```
   
-Look at *web.xml* file (*WebContent->WEB-INF->web.xml*): we added a few JNDI look up resources for tenant context API, Authentication, authorization roles and “search_engine_destination” destination for connectivity service look-up.
+	![](images/02.png)
 
-> NOTE: JNDI stands for Java Naming and Directory Interface, which is an application programming interface (API) that provides naming and directory 
-functionality to applications written using the Java programming language
+1. Of course, doing this you introduced some errors in the code. No worries!. You just need to replace all the **BPDetails** references (5 matches) with **BusinessPartner**, because now we are no longer using the BPDetails class we have defined, but the predefined one coming from the VDM. Go to the **Edit->Find/Replace** menu, enter "BPDetails" in the find box and "BusinessPartner" in the replace box and click **Replace all**. You should have just 5 matches   
+	![](images/03.png)
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-	version="3.1">
-	<display-name>multitenant</display-name>
-	<welcome-file-list>
-		<welcome-file>Connect</welcome-file>
-	</welcome-file-list>
+1. Feel free to remove the **OdataQueryBuilder** import from the class because it's no longer needed; then **save** the file   
+	![](images/04.png)
 
-	<!-- Declare the JNDI lookup of Tentant -->
-	<resource-ref>
-		<res-ref-name>TenantContext</res-ref-name>
-		<res-type>com.sap.cloud.account.TenantContext</res-type>
-	</resource-ref>
-	<!-- Declare the JNDI lookup of destination -->
-	<resource-ref>
-		<res-ref-name>search_engine_destination</res-ref-name>
-		<res-type>com.sap.core.connectivity.api.http.HttpDestination</res-type>
-	</resource-ref>
-	<resource-ref>
-		<res-ref-name>connectivityConfiguration</res-ref-name>
-		<res-type>com.sap.core.connectivity.api.configuration.ConnectivityConfiguration</res-type>
-	</resource-ref>
-	<!-- Declare the JNDI lookup of UserProvider -->
-	<resource-ref>
-		<res-ref-name>user/Provider</res-ref-name>
-		<res-type>com.sap.security.um.user.UserProvider</res-type>
-	</resource-ref>
+1. This is the final code for this class
+	![](images/05.png)
 
-	<login-config>
-		<auth-method>FORM</auth-method>
-	</login-config>
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Protected Area</web-resource-name>
-			<url-pattern>/Connect</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>Admin</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<security-role>
-		<description>All SAP Cloud Platform users</description>
-		<role-name>Admin</role-name>
-	</security-role>
-</web-app>
-```
+1. The same changes must be done to the second class **GetCachedBPByCategoryCommand**. The only difference here is that here we need also to introduce a line for filtering all the Business Partners by the passed category `.filter(BusinessPartner.BUSINESS_PARTNER_CATEGORY.eq(bpCategory))`. You can delete the unused imports related to ODataProperty, ODataQueryBuilder, ODataType. This is the final code of this class  
 
-Before we deploy and test the latest changes on local Tomcat 8 server in Eclipse, we need to create a user ID, roles and other user attributes to test the latest changes.
-> NOTE: This process is for testing purposes only. When you deploy to the cloud, user authentication is still handled by the IDP configured with the extension account. Once you have added user authentication/authorization to your Java application, you can test it first on the local server before uploading it to SAP Cloud Platform.
+	![](images/06.png)
 
-Look here to get more information: <https://help.sap.com/viewer/65de2977205c403bbc107264b8eccf4b/Cloud/en-US/fe47e02fd9514ab889c37250ed771c0c.html>
+1. Finally, the **BPServlet** class must be changed accordingly as well. First add this new import to the file
 
+	```java
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	```  
 
-1.	Open **Servers** view from **Windows->Show View->Servers**  
+	![](images/07.png)
+
+1. Then change this line 
+
+	```java
+	final List<BPDetails> result;
+	```
+with the following and **save** the file
+
+	```java
+	final List<BusinessPartner> result;
+	```
+  
+	![](images/08.png)
+
+1. This is the final version of this class 
+	![](images/09.png)
+
+1. There are no more syntax errors now, but if you try to build the project with Maven as it is, you will get some errors in the test phase  
+	![](images/10.png)
+
+1. So we need to adjust the tests as well, because they are no longer aligned with the latest changes. Go to */integration-tests/src/test/resources/businesspartners-schema.json*  
+	![](images/11.png)
+
+1. There are a few things to change here. First of all we beed to replace the **javaType** with `com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.BusinessPartnerNamespace.BusinessPartner`. Then we need to change the names of the required fields, because they are now coming directly from the BusinessPartnerService and are different. This is the final file
+
+	```json
+	{
+	  "$schema": "http://json-schema.org/draft-04/schema#",
+	  "title": "Business Partners List",
+	  "type": "array",
+	  "items": {
+	    "title": "Business Partner Item",
+	    "type": "object",
+	    "javaType": "com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner",
+	    "required": ["BusinessPartner", "BusinessPartnerName"]
+	  }
+	}
+	```  
 	![](images/12.png)
-1.	Click on the link in the pane or right click on the white space to create a **new server**  
+
+1. Save the file and rebuild the root project again. It should end with a success  
 	![](images/13.png)
-1.	From the **SAP** container choose **Java Web Tomcat 8 Server**, keep **localhost** as server's host name and click on **Next**  
+
+1. Push the application again with the `cf push` command  
 	![](images/14.png)
 
-1. Browse for the latest version of Java Web Tomcat 8 SDK you have installed according to the prerequisites, keep the **Workbench default JRE** and click on **Finish**  
+1. The application should be still working fine. 
+	>NOTE: now the field names are different beacuse we are using VDM, taking the output coming directly from the BusinessPartnerService    
+
 	![](images/15.png)
-1. Click on **Allow** in case you get this message  
+
+1. You have successfully implemented VDM in your application.
+
+
+### <a name="frontend-application"></a>Build frontend application with SAP Web IDE
+In this chapter you are going to see how to use SAP Web IDE to build a very basic SAPUI5 application consuming the simple REST service we have implemented with this application. 
+
+1. Before we continue, since you have some space limitations on your SAP Cloud Foundry Trial Landscape, make sure to completely delete the two applications you have just pushed into your space with the `cf push` command. This because we need to make some room for the Cloud Foundry builder which is a little heavy in terms of memory and disk space
+	![](images/15_2.png)
+
+1. Login with your "developerXX" account (where **XX** must be replaced by your workstation ID) to the S/4HANA Cloud Launchpad through the link provided by your instructor 
 	![](images/16.png)
-1. The server is created: at moment it's empty and stopped  
-	![](images/17.png)
-1.	Double click on the **Java Web Tomcat 8 Server** in the Server pane, switch to **Users** tab and click on the "**+**" sign to add a new user  
+
+1. Once on the Launchpad, switch to the **Extensibility** tab and click on the tile named **SAP Web IDE**  	![](images/17.png)
+
+1. You will be requested to login again: use the same "developerXX" account  
 	![](images/18.png)
-1. Enter "**testuser**" as User ID, choose a password for this user and click **OK**  
+
+1. In SAP Web IDE, click on the **Developer** tab  
 	![](images/19.png)
-1. The user is created: now, let's add a new role. Click on the "**+**" sign in the **Roles** section  
+
+1. From the top menu choose **File -> New -> Project from template**  
 	![](images/20.png)
-1. Enter "**Admin**" and click on **OK**  
+
+1. Select the **Multi-Target Application** template and click **Next**  
 	![](images/21.png)
-1. Now the **testuser** has this **Admin** role assigned  
+
+1. Enter **bpr\_frontend\_project** as the name of the project and click **Next**  
 	![](images/22.png)
-1. Download the file [search\_engine\_destination.txt](files/search_engine_destination.txt?raw=true) by right clicking on this link and choosing **Save link as...**  
-1. Click on the **Connectivity** tab and choose **Import existing Destination**  
+
+1. Keep both Application ID and version as proposed. Then click **Finish**  
 	![](images/23.png)
-1. Select the file you have just downloaded  
+
+1. Once the project is created, right click on the project's name and select **New -> HTML5 Module**   
 	![](images/24.png)
-1. The destination is imported: save the configuration file by clicking on the disk icon on the top left corner  
+
+1. Select the **Featured** category, choose the **SAPUI5 Application** template and click **Next**  
 	![](images/25.png)
-1. Now you can run the application: right click on the project and select **Run As->Run on Server**  
+
+1. Enter **bpfrontend** as Module Name and **com.sap.sample** as Namespace and click **Next**      
 	![](images/26.png)
-1. Choose an existing server and select the **Java Web Tomcat 8 Server**. Then click on **Finish**  
+
+1. Keep the proposed values in the screen and click **Finish**    
 	![](images/27.png)
-1. After a while the server will be **Started** and **Synchronized**  
+
+1. Once the module is created, you can run the module to check that it's working. Expand the module and locate the file *index.html*; then click on the **play** button on the top toolbar  
 	![](images/28.png)
-1. Right click on the name of the server in the Server pane and choose **Application URL->Open**  
+
+1. The web preview is shown, but at moment it's just a blank screen  
 	![](images/29.png)
-1. The logon page will be opened in the Eclipse browser. Enter the credentials for the "testuser" you previously defined and click on **Log in**  
+
+1. You can close the Web Preview  
 	![](images/30.png)
-1. The application should show some information about its configuration. Of course, since you are testing it on local, you don't have any tenant detail  
+
+1. Double click on the *view/View1.view.xml* file, replace the "**content**" tags with the following code and save the file. If you want you can also "beautify" your code by clicking on the **Edit->Beautify** menu. Wehn finished **save** the file
+
+	```xml
+	<content>
+		<!-- Add this between the content tags -->
+	    <List headerText="Business Partners"
+			items="{businessPartner>/}" >
+			<StandardListItem
+				title="{businessPartner>BusinessPartnerName}"
+				description="{businessPartner>BusinessPartner}" />
+		</List>
+	</content>
+	```
+  
 	![](images/31.png)
-1. Congratulations! You have successfully tested your Java application locally.
 
+1. Next, double click on the *controller/View1.controller.js* file and replace the entire content with the following code, then **save** the file
 
-### <a name="deploy-to-sap-cp"></a>Let’s deploy application to SAP Cloud Platform
-In this step, we will be deploying the application we have tested locally in the previous step, to SAP Cloud platform provider account. For this hands-on exercise, we have set up two sub-accounts: one will act as provider account (PROD) and the other (CONSUMER) as consumer account.   
-![](images/32.png)  
-You will be deploying multitenancy application to provider account and subscribing to it from the consumer account.
+	```javascript
+	sap.ui.define([
+		"sap/ui/core/mvc/Controller",
+		"sap/ui/model/json/JSONModel"
+	], function(Controller, JSONModel) {
+		"use strict";
+	
+		return Controller.extend("com.sap.sample.bpfrontend.controller.View1", {
+			onInit: function() {
+				var view = this.getView();
+	
+				jQuery.get("/businesspartners")
+					.done(function(data) {
+						var model = new JSONModel(data);
+						view.setModel(model, "businessPartner");
+					});
+			}
+	
+		});
+	});
+	```
 
-1.	Add a new server by right clicking on the white space inside the Servers pane  
+	![](images/32.png)
+
+1. If you run again your application you get an empty list where you can see just the "Business Partners" header. You can close this preview page for the moment  
 	![](images/33.png)
-1. Choose **SAP Cloud Platform** from the SAP catalog and fill
 
-	Parameter  |Value
-	-----------|---------------------------------------
-	Region host|hana.ondemand.com
-	Server name|SAP Cloud Platform at hana.ondemand.com
-
-	Click on **Next**  
+1. Double click on the *mta.yaml* file in the project explorer on the left and when the file opens on the right hand side, switch to the **Code Editor** tab  
 	![](images/34.png)
-1. Enter the following values and click on **Next**:
 
-	Parameter  |Value
-	----------------|---------------------------------------
-	Application name|connectivity\<xx\> (replace  **\<xx\>** with **your workstation id**
-	Runtime         |Java Web Tomcat 8
-	Subaccount name |ab796571d
-	User name       |\<your\_P/S-username\>
-	Password        |\<your\_password\>
-	Save password   |not flagged
+1. Let's adjust a little bit the quotas of this application as well: double click on the *mta.yaml* file, change both the **disk-quota** and **memory** parameters to **128M**. Then 
+	- replace the **name** module with "bpfrontend-developerxx", where **xx** is your workstation ID
+	- add a new parameter named "**host**" with the value of "bpfrontend-developerxx" as well
+	- Finally save and close the file
 
 	![](images/35.png)
-1. Select the *multitenant* application and click on **Add** to publish this application on the server. Then click **Finish**  
+
+1. Now before we can build this project, we need to install the builder which knows how to deal and build MTA applications. Click the **Preferences** gear on the left side toolbar. Select **Cloud Foundry** and click the dropdown list to choose the CF API Endpoint  
 	![](images/36.png)
-1. When the process finishes, your application has been pushed to the SAP Cloud Platform, but at moment is still stopped  
+
+1. Enter your SAP Cloud Platform Trial Landscape account and click **Log On**  
 	![](images/37.png)
-1. Go to your SAP Cloud Platform cockpit and, among **Java Appplications**, click on the application's name you just pushed  
+
+1. Specify the correct CF API Endpoint where you are going to deploy your application; choose as well the Organization and the Space (they should come filled automatically) and finally click on **Install Builder**  
 	![](images/38.png)
-1. The screen shows you some important details about the chosen application. Click on the **Destinations** tab  
+
+1. After a few minutes, the builder gets installed and you receive the message "The builder in your space is up to date". Click on **Save** and close this page. Actually, if you open your SAP CP Cloud Foundry cockpit you will see that there is a new application in the list: this is the **MTA builder** 
 	![](images/39.png)
-1. In the **Destinations** tab, click on **Import Destination**  
+
+1. Switch the Console View on by clicking on the small console icon on the bottom right hand side  
 	![](images/40.png)
-1. Browse for the *search\_engine\_destination.txt* file you already downloaded  
+
+1. Right click on the project name and choose **Build**  
+	![](images/40_2.png)
+
+1. After some time the build process should finish successfully  
 	![](images/41.png)
-1. The destination is imported. Keep it as it is and click on **Save**  
+
+1. Right click on the Workspace folder choose **Refresh Workspace Items**  
 	![](images/42.png)
-1. Click on the **Roles** tab under Security on the left side and then click on **New Role**  
+
+1. If you look Project Explorer in SAP Web IDE, you will find a new folder named *mta_archives*. Inside this folder you will find a subfolder named as your MTA project containing a *.mtar* file  
 	![](images/43.png)
-1. Add the **Admin** role and click on **Save**  
+
+1. Before we can deploy this file to Cloud Foundry, since we are on the Trial Landscape and we have only 2GB of available space, we need to gain some space. We can do it, by simply deleting the MTA builder which will be no longer used in this exercise. Go to your SAP CP Cloud Foundry cockpit and delete the MTA builder application  
 	![](images/44.png)
-1. The role has been added: now click on the **Assign** button  
+
+1. Go back to SAP Web IDE Full-Stack, right click on the *.mtar* file in the *mta_archives* folder and choose **Deploy -> Deploy to Cloud Foundry**  
 	![](images/45.png)
-1. Enter your user for this role and click on **Assign**  
+
+1. Specify the right Cloud Foudry API Endpoint, the Organization and the Space and click **Deploy**  
 	![](images/46.png)
-1. Security is properly configured: click on the **Overview** tab to go back to the application details  
+
+1. When the deployment finishes you get a small alert on the top right corner of your SAP Web IDE Full-Stack. 
 	![](images/47.png)
-1. Go back to Eclipse and start the application by selecting the *connectivity* server and clicking on the "play" button on the pane's toolbar  
+
+1. At the same time, looking at your SAP CP Cloud Foundry cockpit a new application has been pushed: this is your frontend application  
 	![](images/48.png)
-1. After a couple of minutes the application starts  
+
+1. Before you can test your frontend application, you still need to make a couple of changes to the **Approuter** and push it again. Go to Eclipse IDE and open the **scpsecurity** project. Double click on the *manifest.yml* file and change the **env** section in this way. We are adding a new destination to the file. Don't forget to 
+	- replace the **\<APPLICATION\_NAME\>** with your application's name
+	- replace the **xx** characters with your workstation ID
+	- save the file
+
+	```xml
+  env:
+    TENANT_HOST_PATTERN: 'approuter-(.*).cfapps.eu10.hana.ondemand.com'
+    destinations: '[
+    {"name":"bp-api", "url" :"https://<APPLICATION_NAME>.cfapps.eu10.hana.ondemand.com", "forwardAuthToken": true},
+    {"name":"bp-frontend", "url" :"https://bpfrontend-developerxx.cfapps.eu10.hana.ondemand.com", "forwardAuthToken": true}
+    ]'
+	```  
 	![](images/49.png)
-1. Going back to your SAP Cloud Platform cockpit you see that even here, in the **Overview** page, the application is reported as started. In the same page there is also the **application URL**. Click on this link  
+
+1. Double click on the *xs-app.json* file in the approuter folder and change it in this way. Save the file
+
+	```json
+	{ "welcomeFile": "/bpfrontend/index.html",
+	  "routes": [{
+	    "source": "^/businesspartners",
+	    "destination": "bp-api"
+	  }, {
+	    "source": "/",
+	    "destination": "bp-frontend"
+	  }]
+	}
+	``` 
 	![](images/50.png)
-1. The application's home page is shown: here you can find many more details about the tenant where the application is running  
+
+1. Deploy the **approuter** application again with `cf push`
+
+1. Deploy your Business Partner service application again with `cf push`
+
+1. Now if you open the browser on the link <https://approuter-\<your_account\>.cfapps.eu10.hana.ondemand.com>, where \<your\_account\> is your CF account, you are requested to enter the credentials again. Do it and you will be brought to the application's page  
 	![](images/51.png)
-1. Congratulations! You have successfully deployed you Java application to the SAP Cloud Platform using Eclipse IDE.
 
-
-### <a name="subscribe-to-java-apps"></a>Let’s subscribe to sample java apps from the provider account
-To demonstrate multitenancy concept, we are going to make the consumer account adfd16960 to subscribe to the application "connectivity" in the provider account ab796571d.
-
-1. First of all, check the path where you have installed the SAP Cloud Platform Tools: let's assume it's **\<path\_to\_neo\>**
-1. Open Terminal and run the following command 
-	
-	```sh
-	<path_to_neo>/tools/neo subscribe -a <subaccount_name> -b <your_app> -h hana.ondemand.com -u <YOUR_SAP_USER>
-	```
-	
-	which, in your case, should become
-
-	#### MAC	
-
-	```sh
-	<path_to_neo>/tools/neo.sh subscribe -a adfd16960 -b ab796571d:connectivity<xx> -u <your_user> -h hana.ondemand.com
-	```
-
-	#### WINDOWS
-	```sh
-	<path_to_neo>\tools\neo.bat subscribe -a adfd16960 -b ab796571d:connectivity<xx> -u <your_user> -h hana.ondemand.com
-	```
-	
-	where you need to replace **\<xx\>** with your **workstation ID** and **\<your_user\>** with you P/S-user on SAP Cloud Platform  
-	![](images/52.png)
-> NOTE: in case you get the message to confirm that you are located inside the EU, simply click on YES.
-1. Looking in the SAP Cloud Platform cockpit, under the **Subscriptions** tab, you can see that switching on the toolbar to the **CONSUMER** account, a new subscription has been added in the Subscribed Java Applications set. Click on the subscribed application (connectivity\<xx\>)  
-	![](images/53.png)
-1. The subscription details are shown in the **Overview** tab. If you try to execute the application by clicking on the subscription link...  
-	![](images/54.png)
-1. ... you will see that the application fails with a "**Forbidden**" message. This because we have not yet set up permissions for this subscription  
-	![](images/55.png)
-1. Go to **Roles** tab. The roles is already in because it's inherited from the provider account, but we need to assign users to it. Click on the **Assign** button  
-	![](images/56.png)
-1. Enter your P/S-user and click on **Assign**  
-	![](images/57.png)
-1. This is how the overview page should appear  
-	![](images/58.png)
-	> NOTE: you might need to refresh or close and reopen your browser to get the updated status. 
-1. Now click on the subscription link in the overview page  
-	![](images/59.png)
-1. You should get the application page. Look at the destination information: the application is using the destination registered in the CONSUMER account, this because there is no destination in the SUBSCRIBED application  
-	![](images/60.png)
-1. Go to the **Destinations** tab in the CONSUMER account subscription and click on **Import Destination**  
-	![](images/62.png)
-1. Import again the *search\_engine\_destination.txt* provided with this exercise, change the search URL to <https://www.bing.com> and click on **Save**  
-	![](images/63.png)
-1. Refresh your browser (you might need to wait up to 5 minutes in order to get the change) and you will see that now the application is taking the new destination  
-	![](images/64.png)
-1. Congratulations! You have finished the exercise!
+1. Congratulations! You have successfully created a frontend application for your service.
 
 ## Summary
-This concludes the exercise. You should have learned how to deal with multi-tenant applications.
+This concludes the exercise. You should have learned how to introduce Virtual Data Model in your service and how to build a SAPUI5 frontend application on top of it using SAP Web IDE Full-Stack. Please proceed with the next exercise.

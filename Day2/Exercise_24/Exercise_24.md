@@ -1,899 +1,257 @@
 <table width=100% border=>
-<tr><td colspan=2><h1>EXERCISE 2_4 - IoT Application Enablement</h1></td></tr>
-<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;90 min</h1></td></tr>
+<tr><td colspan=2><h1>EXERCISE 2_4 - IoT : End to End scenario using MQTT and Gateway Cloud</h1></td></tr>
+<tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 mins</h1></td></tr>
 </table>
 
 
 ## Description
-This document provides you with an introduction to IoT Application Enablement. You will learn how to
+This document provides you with the steps for the hands-on session on SAP Cloud Platform Internet of Things. This scenario will help you to go through the following activities:
 
-- create Packages, Thing Types and Things to model your IoT world
-- connect these Things to IoT devices
-- create a SAPUI5 Application for IoT using one of the SAP Web IDE templates
-- simulate data transmission using Postman
-- analyze collected data within the SAPUI5 application
+* Creating Device Data Model in IoT Service Cockpit
+* Device onboarding on Gateway Cloud for MQTT protocol.
+* Sending Sensor Data from Paho MQTT Client
+* Consuming Data via IoT Service Cockpit
+
+>NOTE: Use Google Chrome browser.
+
 
 ## Target group
 
 * Developers
-* People interested in SAP Leonardo and Machine Learning 
+* People interested in SAP Leonardo and IoT
 
 
 ## Goal
 
-The goal of this exercise is to have a quick introduction on IoT Application Enablement
+The goal of this exercise is to create a new device data model in the IoT Service cockpit, to onboard a new device with a sensor with SAP Gateway Cloud for MQTT protocol, to send data with Paho MQTT Client and finally to consume them via IoT Service Cockpit
 
 
 
 ## Prerequisites
-  
-Here below are prerequisites for this exercise.
 
-* Chrome browser
-* SAP IoT Application Enablement system (provided by your instructor)
-* SAP IoT Service system (provided by your instructor)
-* SAP Web IDE system (provided by your instructor)
-* a REST client like Postman plugin for Chrome browser
-* A remote desktop connection app to access the remote system
+Below are some of the prerequisites for this exercise.
+
+* A Remote Desktop Connection app. Credentials to logon will be provided by your instructor
+* An SAP IoT Service cockpit system with user credentials which will be provided by your instructor
 
 
 ## Steps
 
+1. [Introduction](#introduction)
+1. [Creating device data model](#creating-device-data-model)
+1. [Device and sensor onboarding](#device-and-sensor-onboarding)
+1. [Sending messages via MQTT using Paho client](#mqtt-Paho)
+1. [Consuming and viewing sensor data](#consuming-sensor-data)
 
-1. [Create the device model](#create-device-model)
-1. [Create your own Package for Greenhouses](#create-package)
-1. [Create the Thing Model](#thing-model)
-1. [Create a Thing](#create-thing)
-1. [Connect the thing with the device](#connect-thing-with-device)
-1. [Set up Postman to call APIs](#postman)
-1. [Build a SAPUI5 app with SAP Web IDE](#build-app)
-1. [Generate the device certificate](#generate-certificate)
-1. [Install the certificate](install-certificate) 
-1. [Send some data using Postman and analyze sent data](#send-data-with-postman)
-1. [OPTIONAL - Build a freestyle SAPUI5 Application](#freestyle-app)
-1. [OPTIONAL - Build a Python script to send some data](#python-script)
 
 
+### <a name="introduction"></a> Introduction
+The SAP Cloud Platform Internet of Things Service enables customers and partners to develop, customize, and operate IoT business applications in the cloud. SAP CP IoT Service provides Lifecycle management at scale for IoT devices from onboarding to decommissioning. It also provides a way to securely connect to remote devices over a broad variety of IoT protocols. It provides gateway Edge which provides on-premise IoT edge processing and also gateway cloud which does centralized cloud based processing. The **IoT cockpit** is the user interface of the solution and provides access to various functions. It is the main user interface for users to interact with the Internet of Things core service. It can be used for creating users and tenants, for creating device data models, for device onboarding and decomissioning, for adding new networks and to visualize the data which are being ingested via IoT devices/sensors.  
+	![](images/01.png)
 
-### <a name="create-device-model"></a> Create the device model
-The Thing that we will create later, in order to work properly, needs to be attached to a device. In this section we will create it in the IoT Service cockpit, together with a sensor and some properties.
 
-1. With Chrome, navigate to the **IoT Service cockpit** address provided by your instructor and login with the related credentials  
-	![](images/041.png)
 
-1. Select **Capabilities** and click on the **+** sign to create a new Capability  
-	![](images/042.png)
+### <a name="creating-device-data-model"></a> Creating device data model
+Centralized Device data model provides the schema of device related configurations including the data fields that will be exchanged. In order to send data to the IoT service a device data model is required. The device entity must have at least one sensor assigned to it. In case, no sensor is created beforehand a Sensor will be automatically created during data ingestion (default behavior). A new sensor type can be added with capabilities(measures/commands). A capability can be reused since it can be assigned to multiple sensor types and each capability can have one or many properties. 
+In the section below, using the IoT Service Cockpit, initially two capabilities("Soil pH and Moisture") are created, then a sensor type is created and the capabilities are assigned to it. A device is then created and will have one sensor, which is of the custom sensor type.
 
-1. Enter the name **gh\_climate\_ps\_xx** where xx must be replaced with your workstation ID. Then click on the **+** sign to create a new property  
-	![](images/043.png)
+1.	Open the browser and navigate to the IoT Service Cockpit URL and log on with the tenant user credentials, provided by the instructor  
+	![](images/02.png)
 
-1. Enter
+1.	Use the main menu to navigate to the **Device Management** -> **Capabilities** section and click on the **"+"** sign, to add first capability Soil pH  
+	![](images/03.png)
 
-	| Property Name| Property Data Type |
-	| --------- | ----- |
-	| temperature | float |
+1. In the **General information** section enter **Name** as **Soil_pH** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
 
-	and click again on the **+** sign to add again a new property  
-	![](images/044.png)
+	| Parameter | Value    |
+	| --------- | -------- |
+	| Name | Soil\_pH     |
+	| Data Type | float    |
+	| Unit Of Measure | pH |
 
-1. Enter the following set of new properties and click on **Create**
+	![](images/04.png)
 
-	| Property Name| Property Data Type |
-	| --------- | ----- |
-	| temperature | float |
-	| humidity | float |
-	| light | integer |
-	| door\_closed | boolean |
-	
-	![](images/045.png)
+1. Once again navigate to **Capabilities** section and click on the "**+**" sign to add the second capability Soil_Moisture.  
+	![](images/05.png)   
 
-1. Select the **Sensor Types** item in the left-hand menu and click on the **+** sign to create a new sensor type  
-	![](images/046.png)
+1. In the **General information** section enter **Name** as **Soil_Moisture** and in the **Properties** section enter the following information and click on **Create**. Ensure the capability is created successfully
 
-1. Enter **gh\_climate\_sensor\_typ\_xx** for the **Name** (remember to replace **xx** with your workstation ID), select the **gh\_climate\_ps\_xx** capability you have created earlier and set **measure** as its Type. Then click on **Create**  
-	![](images/047.png)
+	| Parameter | Value      |
+	| --------- | ---------- |
+	| Name | Soil\_Moisture |
+	| Data Type | float      |
+	| Unit Of Measure | %    |
 
-1. On the left-hand menu, select **Devices** and click again on the **+** sign to create a new Device  
-	![](images/048.png)
+	![](images/06.png)
 
-1. Enter the following properties and click on **Create**
+1. Navigate to **Device Management** -> **Sensor Types** and click on the "**+**" sign to add a sensor type for the Soil Sensor   
+	![](images/09.png)
 
-	| Parameter| Value |
-	| --------- | ----- |
-	| Name | gh\_climate\_device\_xx (remember to replace **xx** with your workstation ID)|
-	| Gateway | REST Network |
-	![](images/049.png)
+1. In the **General information** section enter **Name** as **gh_soil_sensor_typ_XX**, where **XX** is your workstation ID and in the **Capabilities** section enter and add the earlier created capabilities
 
-1. Select the **Sensors** tab and click on the **+** sign to add a new sensor  
-	![](images/050.png)
+	| Capability | Type       |
+	| --------- | ----------- |
+	| Soil_pH | measure       |
+	| Soil_Moisture | measure |
 
-1. Enter the following properties and click on **Add**
+	![](images/10.png)
+	![](images/11.png)
 
-	| Parameter| Value |
-	| --------- | ----- |
-	| Name | gh\_climate\_sensor\_xx |
-	| Sensor Type | gh\_climate\_sensor\_typ\_xx |
-	(remember to replace **xx** with your workstation ID)
-	![](images/051.png)
+	Click on **Create**. Ensure the Sensor Type is created successfully
 
-1. Your device has been successfully created.  
-	![](images/052.png)
+1. Congratulations! You have successfully created a new data model.
 
+### <a name="device-and-sensor-onboarding"></a> Device and sensor onboarding
+Each device exchanges data with a specific protocol (for example: MQTT in this exercise).  Each device corresponds to 1 unique physical device. We need to create a device that corresponds to a physical device. In the following section, it is described how to create a Device for the MQTT network. Also we onboard the sensor for the Device.
 
+1.	Use the main menu to navigate to **Device Management** -> **Devices** section and click on the "**+**" sign to start the device creation process
 
-### <a name="create-package"></a> Create your own Package for Greenhouses
-	
-1. Open your browser and navigate to the IoT Application Enablement URL provided by your instructor. Logon using the provided credentials paying attention **do not select the Remember me** checkbox  
-	![](images/001.png)
+	>NOTE: As an alternative, devices and sensors can also be created via APIs. In this exercise, we will create it via UI cockpit  
 
-1. Do not save the password in your browser  
-	![](images/002.png)
+	![](images/12.png)
 
-1. A Launchpad opens up: click on the **Package Manager** tile  
-	![](images/003.png)
+1.	In the **General Information** section, enter the following information and click on **Create**
 
-1. Click on the "**+**" sign to create a new package  
-	![](images/004.png)
+	| Parameter | Value |
+	| --------- |----- |
+	| Name | gh_soil_device_XX |
+	| Gateway |MQTT Network |
+	| Alternate ID | \<leave it blank\> |
 
-1. Enter
+	>NOTE: Ignore the Alternate ID as it's optional and is filled on Create. This would be required at later steps to be provided in Paho Client as well    
 
-	| Parameter | Value|
-	| --- | --- |
-	| Name| YY.greenhouse.pkg.XX |
-	| Description | Power Week Greenhouse Package XX |
-	| Scope | Private |
-	
-	where **XX** must be replaced by your workstation ID and **YY** with the 2 characters prefix provided by your instructor. Then click first on **Save** and then on the **Home** button  
-	![](images/005.png)
-
-1. Check that your package has been created successfully and go back to the Launchpad's home page.
-	![](images/006.png)
-
+	![](images/13.png)
 
+1.	In the new device, Sensor tab click on the "**+**" sign to create a new sensor  
+	![](images/14.png)
 
-### <a name="thing-model"></a> Create the Thing Model
-
-1. From the Weather Station Tenant Launchpad click on the **Thing Properties Catalog** tile  
-	![](images/007.png)
+1.	In the General Information section, enter a name such as "**gh_soil_sensor_XX**", replace XX for your workstation ID, select Sensor Type you have created earlier (i.e. gh_soil_sensor_typ_XX, where **XX** must be replaced with your workstation ID) and ignore the Alternate ID as it's optional. This Soil\_Sensor automatically provides Soil\_pH, Soil\_Moisture: these are the capabilities we have previously defined. Once done click on **Add**  
+	![](images/15.png)
 
-1. Click on the "**cube**" button to change package  
-	![](images/008.png)
+1.	The new sensor is created and you should be able to see the **gh_soil_sensor_XX** under the **Sensors** tab of the gh_soil_device_XX device onboarded earlier  
+	![](images/16.png)
 
-1. Search for "pw.greenhouse.pk" and you should be able to find your package named **pw.greenhouse.pkg.xx**, where **xx** must be replace with your workstation ID. Click on your package name  
-	![](images/009.png)
-
-1. Once you have selected your package and you have verified that it's the correct one, click on the "**+**" symbol in the master view. This will allow you to create a new property set  
-	![](images/010.png)
-
-1. Enter the same name you used for the property set when you created your capability in IoT service cockpit. If you don't do this, then you won't be able to attach your thing with the device, If you have followed the name convention for creating the capability then this must be **gh\_climate\_ps\_xx**. Enter 
+1. Be sure that your gh_soil_device_XX device is selected, choose the **Certificate** tab and click on **Generate Certificate**  
+	![](images/17.png)
 
-	| Parameter | Value|
-	| --- | --- |
-	| Name | gh\_climate\_ps\_xx |
-	| Description | Greenhouse Climate Property Set xx |
-	| Property Set Category | Measured Values |
+1. Choose the Certificate Type **P12** and click **Generate**  
+	![](images/18.png)
 
-	(remember to replace **xx** with your workstation ID) and click **Save**  
-	![](images/011.png)
+1. This will trigger a popup window providing you with a secret key which you must copy and save in notepad. Then click **OK**  
+	![](images/19.png)
 
-1. A new property set has been added. Keeping it selected, click on the "**+**" symbol in the **Measured Values** section  
-	![](images/012.png)
+1. You can also see the downloaded certificate *Paho\_Client\_XX-device\_certificate.p12* in the Chrome browser status bar. Click on the small down arrow and choose **Show in folder**  
+	![](images/20.png)
 
-1. Enter the following values and click **OK**
 
-	| Parameter | Value|
-	| --- | --- |
-	| Name| temperature |
-	| Unit of Measure | °C |
-	| Type | Float |
-	| Thresholds | - select all thresholds options - |
-	![](images/013.png)
+1. This will make you understand where the certificate is located. Please keep in mind this location since it will be used in the next section  
+	![](images/20a.png)
 
-1. Click again on the "**+**" sign to add a couple of other measures. Add humidity with these parameters and click **OK**
+1. Congratulations! You have successfully onboarded a new device and a new sensor.
 
-	| Parameter | Value|
-	| --- | --- |
-	| Name| humidity |
-	| Unit of Measure | % |
-	| Type | Float |
-	| Thresholds | - select all thresholds options - |
-	![](images/014.png)
-	
-1. Add the light with these parameters and click **OK**
 
-	| Parameter | Value|
-	| --- | --- |
-	| Name| light |
-	| Unit of Measure | CD |
-	| Type | Integer |
-	| Thresholds | - select all thresholds options - |
-	![](images/015.png)
+### <a name="mqtt-Paho"></a> Sending messages via MQTT using Paho client
+In this step, we will send the data from Device Simulator that supports MQTT protocol. We have already on-boarded this simulator device during previous steps. Once we send the data, it would be received by Internet of Things Gateway Cloud and would be visible in the IoT services cockpit and via APIs.
 
-1. In the Status Values section click on the **+** symbol  
-	![](images/016.png)
+1.	Launch the **MQTT Paho Client**, it should be located under the *C:\Student\PahoClient* folder  
+	![](images/21.png)
 
-1. Add the property **door\_closed** (it will automatically have "boolean" as type) and click **OK**  
-	![](images/017.png)
+1. 	Click on **Run** in case you get a security warning  
+	![](images/22.png)
 
-1. At the end you should have the following situation: click on the **Save** button and you should receive a message **"Property set was saved"**  
-	![](images/018.png)
+1.	Click on the "**+**" sign to create a new connection  
+	![](images/23.png)
 
-1. Let's set a couple of properties even for the Default Property set containing some Basic Data. Select it and click on the **+** sign to add a new property  
-	![](images/019.png)
-
-1. Enter 
-
-	| Parameter | Value|
-	| --- | --- |
-	| Name| model |
-	| Type | String |
-	| Length | 16 |
-	
-	and click **OK**  
-	![](images/020.png)
-
-1. Add another property named **serial**  
-
-	| Parameter | Value|
-	| --- | --- |
-	| Name| serial |
-	| Type | String |
-	| Length | 16 |
-	
-	and click **OK**. These two property could be used for example to host the model and the serial numbers of the greenhouse thing  
-	![](images/021.png)
-
-1. Once the properties have been added click on **Save** and and you should receive a message **"Property set was saved"**  
-	![](images/022.png)
-
-1. At the end you should get the following situation  
-	![](images/023.png)
-
-1. Click on the **Thing Modeler** button  
-	![](images/024.png)
-	
-1. Make sure you are in the right package, **yy.greenhouse.pkg.xx** where **xx** is your workstation ID and **yy** the prefix provided by your instructor, select the **Thing Types** tab in the master view and click on the "**+**" sign  
-	![](images/025.png)
-
-1. Enter
-
-	| Parameter | Value|
-	| --- | --- |
-	| Name| greenhouse\_tt\_xx |
-	| Description | Greenhouse Thing Type xx |
-
-	where **xx** must be replaced with your workstation ID, and click **Save**  
-	![](images/026.png)
-
-1. Select the **Basic Data** tab and click on the "**+**" to add a new Property Set to this Thing Type  
-	![](images/027.png)
-
-1. Select the default property set and click on **OK**  
-	![](images/028.png)
-
-1. The Default property set has been added to the Basic Data of this Thing Type  
-	![](images/029.png)
-
-1. Select the **Measured Values** tab and click on the "**+**" to add a new Property Set to this Thing Type  
-	![](images/030.png)
-
-1. Locate the property set you have defined earlier, select it by the checkbox and click on **OK**  
-	![](images/031.png)
-
-1. All the propeties you defined earlier are automatically added. Click on the **Save** button at the bottom of the page  
-	![](images/032.png)
-
-1. Get a picture for your greenhouse by searching it on the web or by right clicking on this [greenhouse.jpg](files/greenhouse.jpg?raw=true) link and saving the image on your machine
-
-1. Click on the **Image** tab and press "**+**" to add a new image  
-	![](images/033.png)
-
-1. Browse for the desired image and add it to the Thing Type  
-	![](images/034.png)
-
-1. The image has been successfully added.  
-	![](images/035.png)
-
-
-
-### <a name="create-thing"></a> Create a Thing
-In this section you are going to learn how to create a Thing using the SAP IoT AE UI. The Thing is based on the Thing Type you created earlier. Then you will learn how to use the Thing Modeler to create thresholds for temperature and finally how to update the location of the Thing with Postman. This step is required to give this thing a location so it can show up on a map in the UI correctly.
-
-1. Keeping the **small\_greenhouse\_tt\_xx** Thing Type selected, click on the **New Thing** button on the top right corner. This will create a new thing based on the Thing Type you have chosen  
-	![](images/036.png)
-
-1. Enter
+1.	Configure the **MQTT** tab of **connection1** with this information
 
 	| Parameter | Value |
 	| --------- | ----- |
-	| Name | greenhouse\_xx |
-	| Description | Greenhouse xx |
-	| Authorization Group | the one starting with "6b569" |
-	| Provider | None |
-	
-	then click on **Save**
-	>NOTE: Set first the **Provider** field to **None** so that all other unnecessary fields will go away.  
-	
-	![](images/037.png)
+	| Server URI | `ssl://<host_name>:8883` where **\<host\_name\>** is the host part in the cockpit  URL |
+	| Client ID | The AlternateID of the Device gh_soil_device_XX |
 
-1. You will get a popup window informing you that a new thing has been created. Please note down in a text editor the **Thing ID**, because it will be required later. Click on **OK**  
-	![](images/038.png)
+	![](images/24.png)
 
-1. This is your new Thing based on the specified Thing Type  
-	![](images/039.png)
+1.	Click on **OPTIONS** tab, select **Enable SSL** and click on the first **Browse...** button to specify the Key Store Location  
+	![](images/25.png)
 
-1. Switch to the **Measured Values** tab, expand the temperature property and enter **[1,10,30,45]** for the 4 thresholds values; then click **Save**  
-	![](images/040.png)
+1.	Change the file extension search criteria to \*.p12 and browse for the *Paho\_Client\_XX-device\_certificate.p12* you have downloaded from IoT Service Cockpit  
+	![](images/26.png)
 
+1. 	As Key Store Password, specify the client secret you had copied in your notepad. Then click on the second **Browse...** button to locate the Trust Store repository  
+	![](images/27.png)
 
+1. Change the file extension search criteria from \*.jks to \*.\* and go to the folder *\<JRE\_Installation\_Folder\>\jre\lib\security*, in your case it should be *C:\Program Files\Java\jre1.8.0_161\lib\security*. Once there, select the file *cacerts* and click **Open**  
+	![](images/28.png)
 
+1. 	As Trust Store password, simply use the text "**changeit**"  
+	![](images/29.png)
 
-### <a name="connect-thing-with-device"></a> Connect the thing with the device
-We can now connect the Thing with the created device.
+1.	Go to the **MQTT** tab and click on **Connect**  
+	![](images/30.png)
 
-1. Ensure you are in the **greenhouse\_xx** thing (where **xx** is your workstation ID), then click on the **Connect** button on the top right corner  
-	![](images/053.png)
+1.	Status should turn to **Connected** as shown in the picture  
+	![](images/31.png)
 
-1. First set the **Device ID** by clicking on the drop down menu  
-	![](images/054.png)
+1.	In the **Publish** section, enter the topic `measures/<alternate_id>` replacing `alternate_id` with the **Alternate ID** of the device  
+	![](images/32.png)
 
-1. Enter **gh\_cli** to filter the device list and select the device **gh\_climate\_device\_xx** you created previously (**xx** is your workstation ID)  
-	![](images/055.png)
+1. 	Use the default settings for **QOS**
 
-1. Then select the **Sensor**  
-	![](images/056.png)
+1. Copy the following JSON script and paste it in a text editor
 
-1. It should appear automatically because related to the selected device. Click on the proposed sensor  
-	![](images/057.png)
-
-1. As soon as both Device and Sensor are specified, the matching between Thing Property Set and Sensor Capability is performed. If you have properly followed the exercise, the matching should be successful: all the squares in the Data Type Matching column on the right should be green. Click on **Save**  
-	![](images/058.png)
-
-1. A summary of the preformed matching is displayed. Click **OK**  
-	![](images/059.png)
-
-1. Congratulations! You have successfully connected your thing with a device.
-
-
-
-### <a name="postman"></a> Set up Postman to call APIs
-In order to perform this step you need to have Postman Interceptor installed in your Chrome browser. You should have already installed it if you have followed the prerequisites to this execises series. However, for your comfort, we are adding here the required steps to do it: so if you have not done it yet, do it right now. 
-
-1. Open Chrome and navigate to <https://chrome.google.com/webstore/search/postman%20interceptor> and select the **Postman Interceptor** tool  
-	![](images/060.png)
-
-1. Click on **ADD TO CHROME**  
-	![](images/061.png)
-
-1. Download the zip file [postman\_json\_files.zip](files/postman_json_files.zip?raw=true) and extract it in a proper location on your machine
-
-1.	Open Postman from <chrome://apps/>  
-	![](images/062.png)
-
-1.	Click on **Import**  
-	![](images/063.png)
-
-1.	Import the two json files you have extracted from the *postman\_json\_files.zip* file  
-	![](images/064.png)
-	 
-1. You should receive a couple of confirmation messages that the import was successful  
-	![](images/065.png)
-
-1.	Select the **wdiot1** environment on the upper right corner, press the **Eye** icon, and click on **Edit**  
-	![](images/066.png)
-
-1.	Change the
-
-	| Parameter | Value|
-	| --- | --- |
-	| number| xx |
-	| packageId | yy.greenhouse.pkg.xx (this is the name you used earlier)|
-	 
-	where **xx** is your workstation ID and **yy** is the prefix provided by your instructor. Then click on **Update**  
-	![](images/067.png)
-
-1. Close the popup window from the top right corner  
-	![](images/068.png)
-	
-1. Make sure that the **Postman Interceptor** is enabled  
-	![](images/069.png)
-
-1.	On the left-hand side, select **01 Thing Configuration -> Read configuration**. A new tab opens up on the right-hand side containing a GET request to read the package configuration. Some of the variables in the URL request will be replaced by the corresponding ones in the environment you have configured before. Click on **Send**  
-	![](images/070.png)
-
-1. You should get a JSON file with all the details about your package configuration  
-	![](images/071.png)
-
-1. If the response you get is only an HTML file, it means that there is something wrong. Please check that your Postman Interceptor is enabled and try by signing in again to the Weather Station on Chrome with your credentials  
-	![](images/072.png)
-
-1. In the **wdiot1 iotae apis** collection, click on **Thing Onboarding -> Fetch csrf token**. Click **Send** and you should receive a "**200 OK**" status code with some JSON in the response body  
-	![](images/073.png)
-
-1. Switch to the **Headers** tab and copy the **x-csrf-token** key in the clipboard
-	![](images/074.png)
-
-1. On the top right corner, be sure to have the **wdiot1** environment selected, click on the **eye** button and then on **Edit**  
-	![](images/075.png)
-
-1. Replace the field **yourthingId** with the **Thing ID** you received when you created the thing and replace the **x-csrf-token** with the value you have copied in the clipboard; click on **Update**  
-	![](images/076.png)
-
-1. Close the popup window  
-	![](images/077.png)
-
-1. Now that we have set the Thing ID in our environment and that we have get a valid **x-csrf-token**, we are ready to create a location for that thing. In the same collection, click on **Thing Onboarding -> Create Location**. Switch to the **body** tab and take a look to the location you are going to create  
-	![](images/078.png)
-
-1. If you want you can go to the website <https://www.latlong.net> and find your own location, copy and paste the latitude and longitude in this JSON body and fill the other location details  
-	![](images/079.png)
-
-1. When finished changing your location click on **Send**  
-	![](images/080.png)
-
-1. The location is created. You should receive a "**201 Created**" message. Note down the **location ID** you received in the headers  
-	![](images/081.png)
-
-1. Go to the **Thing Onboarding -> Read the created thing**, click on **Send** and copy in the clipboard the entire response body. In this way we are copying the Thing's metadata, we will use this in the next step  
-	![](images/082.png)
-
-1. Go to the **Thing Onboarding -> Update Thing (incl. location)**, delete the current **body** content and paste the one you have in the clipboard  
-	![](images/083.png)
-
-1. Just above the **"\_objectGroup"** property, add the line 
-	
-	```
-	"_location":"<location_ID>",
-	``` 
-	
-	where **\<location\_ID\>** must be replaced by the location ID you got in the headers when you created the location (you should have noted down this ID already). Then click **Send** and check that you have received a "**201 Created**" message  
-	![](images/084.png)
-
-1. Go to the **Thing Onboarding -> Read the created thing**, click on **Send** and check that the thing has been updates with the new **\_location** property  
-	![](images/085.png)
-
-1. The same information can be now read in the IoT Application Enablement cockpit
-	
-	>NOTE: Refresh the browser if you don't see the Location information.
-	 
-	![](images/086.png)
-	
-1. Congratulations! You have successfully updated your Thing by using Postman REST Client.
-
-
-
-### <a name="build-app"></a> Build a SAPUI5 app with SAP Web IDE
-In this section you will build a simple SAPUI5 app which allows you to monitor your greenhouses (in this case you have only one) and examine data its connected sensors generate.
-
-1. Open **SAP Web IDE** using the URL provided by your instructor and logon using the related credentials  
-	![](images/087.png)
-
-1. You get the Home page of your Development Environment  
-	![](images/088.png)
-
-1. Click on the small gear on the left toolbar, select **Features**, type "iot" in the search box, locate the **IoT Application Enablement** plugin and **enable** it; then click on **Save**  
-	![](images/089.png)
-
-1. You will be requested to restart SAP Web IDE; click on **Refresh**  
-	![](images/090.png)
-
-1. From the main menu select **File -> New -> Project from Template**  
-	![](images/091.png)
-
-1. Browse for the Category "Internet of Things", select the **IoT Application** tile and click **Next**  
-	![](images/092.png)
-
-1. Enter the following information and click **Next**
-
-	| Parameter | Value|
-	| --- | --- |
-	| Package Name| greenhouse\_xx |
-	| Namespace | com.greenhousexx |
-	| Title | Greenhouse Application |
-
-	(remember to replace **xx** with your workstation ID)  
-	![](images/093.png)
-
-1. Select the Service "**IOTAS-ADVANCEDLIST-THING-ODATA**" and browse for the **Property Sets**  
-	![](images/094.png)
-
-1. Open the drop down list  
-	![](images/095.png)
-
-1. Enter **yy.greenhouse.pk** (**yy** is the prefix provided by your instructor) in the searchbox and select the Thing Type you have created earlier. You need to choose the one with your workstation ID. Then click **OK**  
-	![](images/096.png)
-
-1. Select all the common property sets and click **OK**  
-	![](images/097.png)
-
-1. Once you have specified Service and Property Sets click **Next**  
-	![](images/098.png)
-
-1. Click **Next**  
-	![](images/099.png)
-
-1. Click **Next**  
-	![](images/100.png)
-
-1. Click **Next**  
-	![](images/101.png)
-
-1. Click **Next**  
-	![](images/102.png)
-
-1. Click **Finish**  
-	![](images/103.png)
-
-1. The application is created. Expand the *webapp* folder and select the *index.html* file; then click on the **Run** button on the toolbar to execute your application  
-	![](images/104.png)
-
-1. The application is executed. You should be able to see your Thing on the left side and a map showing its location on the right  
-	![](images/105.png)
-
-1. Click on the pin point on the map and then on **Analysis Page**  
-	![](images/106.png)
-
-1. The Analysis Page is shown, but at moment there are no data. We will see in the next step how to load data in the app  
-	![](images/107.png)
-
-1. Congratulations! You have successfully created a SAPUI5 application to analyze IoT data!
-
-
-
-### <a name="generate-certificate"></a> Generate the device certificate
-Before we can send some data to the device we need to establish a connection with it in Postman. For this we need to use a special certificate provided by the device itself in the IoT Service cockpit
-
-1. Go to your IoT Service cockpit and login with your credentials  
-	![](images/108.png)
-
-1. Select **Devices** on the left, seacrh by Name, type "gh_*" in the search box and select your device **gh\_climate\_device\_xx** (where **xx** is your workstation ID)  
-	![](images/109.png)
-
-1. Select the **Certificate** tab and click on **Generate Certificate**  
-	![](images/110.png)
-	
-1. Select **p12** as Certificate Type and click **Generate**. The certificate will be generated and you will receive a prompt to save the file on your disk. Please keep in mind where you put it, since it will be required in the next section  
-	![](images/111.png)
-
-1. Write down the Secret Key you received and click **OK**  
-	![](images/112.png)
-
-1. If you forgot where you saved the certificate, you can click on the small down arrow beside the downloaded file in the Chrome status bar and select Show in Finder(MAC) or View in Explorer (WIN).  
-	![](images/113.png)
-
-
-
-
-### <a name="install-certificate"></a> Install the certificate
-At this point we need in some way to install the certificate we have downloaded in your system so that it can be used by a REST client like POSTMAN. We are going to illustrate here two distinct procedures for installing this certificate, one for Windows and another for MAC.
-
-#### --- Windows Users ---
-
-1. Open Chrome browser and go to <chrome://settings>  
-	![](images/114.png)
-
-1.	Search for SSL in search text field: you get **Manage HTTPS/SSL certificates and settings**. Click on this link  
-	![](images/115.png)
-
-1.	Once in the certificate manager, go to the **Personal** tab and click on **Import...**  
-	![](images/116.png)
-
-1.	**Certificate Import Wizard** will be opened: click on **Next**  
-	![](images/117.png)
-
-1.	Browse to folder where you have saved the p12 certificate and choose "All Files (*.*)" in the file extension drop down list  
-	![](images/118.png)
-
-1.	Select the certificate and click **Open**  
-	![](images/119.png)
-
-1.	Enter the **secret key** you obtained while downloading device certificate and noted down in a text editor; then click **Next**  
-	![](images/120.png)
-
-1. Click **Next**  
-	![](images/121.png)
-
-1.	Finally, click on the **Finish** button  
-	![](images/122.png)
-
-1.	You should receive the information that the import was successful.  
-	![](images/123.png)
-
-
-#### --- MAC Users ---
-
-1. Open the **Keychain** utility and select **File -> Import Items...**  
-	![](images/124.png)
-
-1. Locate the p12 certificate you downloaded earlier  
-	![](images/125.png)
-
-1. Enter your MAC credentials if required  
-	![](images/126.png)
-
-1. Enter the **secret key** you obtained while downloading the certificate and noted down in a text editor; then click **OK**  
-	![](images/127.png)
-
-1. The certificate is imported, but it's not yet trusted. You can see a message saying that this certificate was signed by an unknown authority. Double click on the certificate  
-	![](images/128.png)
-
-1. In the **Trust** section choose **Always Trust** for the parameter "When using this certificate"  
-	![](images/129.png)
-
-1. Enter your MAC credentials if required and click **Update Settings**  
-	![](images/130.png)
-
-1. The certificate is now successfully imported and trusted  
-	![](images/131.png)
-
-
-
-
-### <a name="send-data-with-postman"></a> Send some data using Postman and analyze sent data
-As final step for this exercise we can send some data to the device using Postman, to see if data is really visible in the SAPUI5 application. Of course this is just a simulation because real data should come to the device from the sensors, but since we don't have physical sensors, we can simply emulate them using REST requests.
-However before we can proceed, we need to gather some information from the IoT Services cockpit. What we need is the Device Alternate ID, the Capability Alternate ID and the Sensor Alternate ID of our IoT configuration.
-
-1. Go to the IoT Service cockpit Note down the Host name. 
-	![](images/181.png)
-
-1. Select **Devices** on the left-hand menu, on right hand page filter for your device and you can read the **Device Alternate ID** in the header. Note that down.   
-	![](images/184.png)
-	
-1. Select the Device by clicking it and in the Sensors tab, note down the **Sensor Alternate ID** for your Sensor. 
-	![](images/183.png)
-
-1. Now switch to Capabilities, filter for your capability and get on the right side the **Capability Alternate ID**. Note down this ID  
-	![](images/186.png)
-
-1. Now, open Postman and **disable** the Postman Interceptor  
-	![](images/134.png)
-
-1.  Create a new request specifying the following configuration:
-
-	- Method: **POST**
-	- URL: `https://<host_name>/iot/gateway/rest/measures/<device_alternate_ID>`
-	- Click on the Header tab and enter Key as **Content-Type** Value as application/json
-	- Click on the Body tab and select the **raw** with **JSON** format
-	- In the body section enter the following JSON code
-	
 	```json
 	{
-	    "capabilityAlternateId":["<capability_alternate_ID>"],
-	    "sensorAlternateId":"<sensor_alternate_ID>",
-	    "measures":[{"temperature":25,"humidity":71}]
+	"capabilityAlternateId":[
+		"<<< Soil_pH Capability Alternate ID >>>",
+		"<<< Soil_Moisture Capability Alternate ID >>>"
+		],
+	"measures":[7,35],
+	"sensorAlternateId":"<<< Sensor Alternate ID >>>"
 	}
 	```
-	
-	Of course, you need to replace **\<device\_alternate\_ID\>**, **\<capability\_alternate\_ID\>** and **\<sensor\_alternate\_ID\>** with the values gathered earlier. When finished press the **Send** button  
-	![](images/185.png)
-	![](images/135.png)
 
-1. Select the right certificate (the right one should be the one with the same your Device Alternate ID) and click **OK**  
-	![](images/136.png)
+1. Replace the **<<< Sensor Alternate ID >>>** with the **Alternate ID** you can read by going on your **gh_soil_sensor_XX** in your **gh_soil_device_XX** device  
+	![](images/33.png)
 
-1. You should receive a successful response from the server with a status code of "**200 OK**"  
-	![](images/137.png)
+1. Then go to **Sensor Types** -> **gh_soil_sensor_typ_XX**  
+	![](images/34.png)
 
-1. Keep changing measures data in the request body and sending them again. Do it for 5 or 6 times with an interval of 1 or 2 minutes from each other  
-	![](images/138.png)
+1. Replace the **<<< Soil_pH Alternate ID >>>** with the Alternate ID of the Soil_pH capability  
+	![](images/35.png)
 
-1. Go back to your SAP Web IDE application. Run the application again or refresh the page if already open. Click on **Measured Values**  
-	![](images/139.png)
+1. Repeat the previous 2 steps for the other capability (Soil_Moisture). At the end copy the JSON script you have created and paste it in the Message text area of your Paho Client. Then click **Publish**  
+	![](images/36.png)
 
-1. Select just **temperature** and **humidity** and click **OK**  
-	![](images/140.png)
+1. A new line is added to the history on the right. Repeat this step several times, each time by changing the values for Soil\_pH and Soil\_Moisture in the  measures section of the JSON file  
+	![](images/37.png)
 
-1. Switch to the **1 Hour** tab and resize the time range using the slide control at the bottom of the page: you should be able to see data in the application  
-	![](images/141.png)
+1. At the end you should have a history with several different publications  
+	![](images/39.png)
 
-1. Congratulations! You have successfully sent some sensor data with Postman and analyzed them with the SAPUI5 application in SAP Web IDE.
+1. Congratulations! You have successfully sent sensor data/messages via MQTT using the Paho Client.
 
 
 
-### <a name="freestyle-app"></a> OPTIONAL - Build a freestyle SAPUI5 Application
-This is an OPTIONAL part of the exercise. There is another way to create an IoT application with SAP Web IDE, which is to use the Freestyle IoT Application template. With this template you are free to adjust the application layout and behaviour as you wish using some built-in components. 
+### <a name="consuming-sensor-data"></a> Consuming and viewing sensor data
+This section explains various ways we can consume and visualize the measurements which are sent to IoT Cloud Gateway.
 
-1. Open SAP Web IDE and from the main menu select **File -> New -> Project from Template**  
-	![](images/142.png)
+1. Select your **gh_soil_device_XX** device in the cockpit, go to the **Data Visualization** tab, specify your Sensor - **gh_soil_sensor_XX**, a capability - **Soil_pH** and the property - **Soil_pH** you want to analyze (click on the **Refresh** button if neded). You should get a chart with all the data  
+	![](images/40.png)
 
-1. Browse for the **Internet Of Things** Category and select the **Freestyle IoT Application** template; then click **Next**  
-	![](images/143.png)
+1. Feel free to do the same for the **Soil_Moisture** capability  
+	![](images/41.png)
 
-1. Enter the following information and click **Next**
-
-	| Parameter | Value|
-	| --- | --- |
-	| Package Name| greenhouse\_fs\_xx |
-	| Namespace | com.greenhouse.fsxx |
-	| Title | Greenhouse Freestyle Application |
-
-	(remember to replace **xx** with your workstation ID)  
-	![](images/144.png)
-
-1. Select the Service "**IOTAS-ADVANCEDLIST-THING-ODATA**" and browse for the **Property Sets**  
-	![](images/145.png)
-
-1. Open the drop down list  
-	![](images/146.png)
-
-1. Enter "pw.greenhouse.pk" in the search box and select the Thing Type you have created earlier. You need to choose the one with your workstation ID. Then click **OK**  
-	![](images/147.png)
-
-1. Select all the common property sets and click **OK**  
-	![](images/148.png)
-
-1. Once you have specified Service and Property Sets click **Next**  
-	![](images/149.png)
-
-1. Select the **3 Column Layout** and click **Finish**  
-	![](images/150.png)
-
-1. You will get the Freestyle Application Storyboard. Double click on the tile in the middle of the screen  
-	![](images/151.png)
-
-1. The layout editor appears  
-	![](images/152.png)
-
-1. From the left-hand toolbar drag & drop on the 3 columns the following components in sequence: **ThingList**, **Gauge** and **SensorChart**  
-	![](images/153.png)
-
-1. Select the first column and from the **Events** tab on the right-end side click on the **Row Select** drop down list, choosing **Wire to Action**  
-	![](images/154.png)
-
-1. Enable the **doReload** action for both the **IoTGauge** and the **IoTChart** and click **OK**  
-	![](images/155.png)
-
-1. At the end you should have this screen  
-	![](images/156.png)
-
-1. Now select the **Gauge**, go to the **Properties** tab and click on the **Entity Set** drop down list  
-	![](images/157.png)
-
-1. Choose **Define dummy entity set for the selected control...** and select **/Things** as the Entity Set; then click **OK**  
-	![](images/158.png)
-
-1. Now that you have defined **/Things** as the Entity Set, click on the **Value** drop down list  
-	![](images/159.png)
-
-1. Double click on the **gh\_climate\_ps\_xx.temperature (double)** property, so that it will be added to the right side, then click **OK**  
-	![](images/160.png)
-
-1. The application is ready to be tested. Click on the **Run** button on the top toolbar  
-	![](images/161.png)
-
-1. The application is executed. Select the Thing on the left column and click on the **...** button on top of the last column. Choose a small interval like **12 Hours** or **1 Hour** (this will enable you to see data you have sent some minutes ago) and click on **Measured Values**  
-	![](images/162.png)
-
-1. Select a couple of properties like **temperature** and **humidity** and click **OK**  
-	![](images/163.png)
-
-1. Data are displayed on the third column  
-	![](images/164.png)
-
-1. Congratulations! You have successfully created a SAPUI5 IoT app using the Freestyle IoT Application template.
-
-
-### <a name="python-script"></a> OPTIONAL - Build a Python script to send some data
-This is an OPTIONAL part of the exercise. In case for example you want to send data from your Raspberry PI, you may want to build a Python script which reads the GPIOs values sending them to the IoT service. In this example, we are going to send some random data, but it's easy to understand how the same script can be adapted to work with a real device 
-
-
-1. Create a new folder on your machine
-
-1. Copy to this folder the **sg\_climate\_dev\_xx-device\_certificate.p12** certificate you have already imported in your system. We need to convert the certificate, splitting it in two parts: a PEM and a KEY files.
-
-1. Open terminal and go to this folder  
-	![](images/170.png)
-
-1. Run the command `openssl pkcs12 -in <certificate_name>.p12 -nokeys -out certificate.pem`, where **\<certificate\_name\>** is the name of the certificate you have downloaded for your device, to convert the certificate file from p12 to PEM. You will be requested to enter the secret key received when you generated the certificate  
-	![](images/171.png)
-
-1. Run the command `openssl pkcs12 -in <certificate_name>.p12 -nocerts -out privkey.pem`, where **\<certificate\_name\>** is the name of the certificate you have downloaded for your device, to generate the private key with passphrase: first enter the secret key received when you generated the certificate and then an arbitrary PEM password (say: 1234)
-	![](images/172.png)
-
-1. Run the command `openssl rsa -in privkey.pem -out certificate.key` to remove the passphrase from the key since it's not supported in the Python "requests" library. You will be requested to re-enter the password specified at the previous step (i.e. 1234)  
-	![](images/173.png)
-
-1. In your folder you should have now two files: a certificate "*certificate.pem*" and a key "*certificate.key*". The "*privkey.pem*" can be deleted because no longer needed  
-	![](images/174.png)
-
-1. Inside this folder create a new file named *send\_data.py* with the following content
-
-	```py
-	import sys
-	import requests
-	import json
-	import time
-	import math
-	import random
-	
-	# replace these variables
-	deviceAlternateId = '<your_device_alternate_ID>'               # the device Alternate ID
-	sensorAlternateId = '<your_sensor_alternate_ID>'               # the sensor Alternate ID
-	capabilityAlternateId = '<your_capability_alternate_ID>'       # the capability Alternate ID
-	tenant = 'https://<your_host_name>/iot/gateway/rest/measures/' # the IoT Service Host Name
-	
-	postAddress = (tenant + deviceAlternateId)
-	print ('Posting to:', postAddress)
-	
-	# Time intervall for polling the sensor data in seconds
-	timeIntervall = 5
-	
-	# Number of iterations
-	iterations = 20
-	
-	
-	for x in range (0, iterations):
-	
-	    try:
-	        print("")
-	        print("============================================")
-	        print("Reading sensor data ...")
-	  
-	
-	        humidity = random.randint(10,99)
-	        temperature = random.randint(0,40)
-	        light = random.randint(1,500)
-	
-	        if math.isnan(humidity) == False and math.isnan(temperature) == False:
-	            valueHumidity = humidity
-	            valueTemp = temperature
-	            valueTempF = temperature * 1.8 + 32
-	            print("Temperature value = %d" %valueTemp, "C", "/ %dF" %valueTempF)
-	            print("Hummidity value = %d" %valueHumidity, "%")
-	
-	
-	        valueLight = round(light,2)
-	        print("Light value = %f" %valueLight, "CD")
-	
-	            
-	        bodyJson =  {
-	        			"capabilityAlternateId":capabilityAlternateId,
-	        			"sensorAlternateId":sensorAlternateId,
-	                    "measures":[{"door_closed":"true","temperature":valueTemp,"humidity":valueHumidity,"light":valueLight}]
-	                    }
-	
-	        data = json.dumps(bodyJson)
-	        headers = {'content-type': 'application/json'}
-	        r = requests.post(postAddress,data=data, headers = headers,cert=('certificate.pem', 'certificate.key'), timeout=5)
-	        responseCode = r.status_code
-	        print (str(bodyJson))
-	        print ("==> HTTP Response: %d" %responseCode)
-	        
-	        # wait timeIntervall [s] before reading the sensor values again
-	        time.sleep(timeIntervall)
-	        
-	    except IOError:
-	        print ("Error")
-	```
-	![](images/175.png)
-
-1. In this code, replace the following variables with your values and save the file
-	- **\<your\_device\_alternate\_ID\>** with your device Alternate Id
-	- **\<your\_sensor\_alternate\_ID\>** with your sensor Alternate Id
-	- **\<your\_capability\_alternate\_ID\>** with your capability Alternate Id
-	- in the tenant URL, replace **\<host\_name\>** with the one provided by your instructor  
-	![](images/176.png)
-
-1. If you want you can also adjust two other parameters like the **timeInterval** which is set to 5 seconds and the numeber of **iterations** which is set to 20. The first one is the interval between each send command and the second is how many send commands you want to issue  
-
-1. From the Terminal window, run the command `python send_data.py`. For each iteration you should receive a **HTTP Response** code of **200**  
-	![](images/177.png)
-
-1. If you look now at the analysis page of your application you should see the values you just sent.  
-	![](images/178.png)
-
-
+1. Congratulations! You have successfully consumed and analyzed sensor data.
 
 ## Summary
 You have completed the exercise!
- 
-You are now able to: 
 
-* create Packages, Thing Types and Things to model your IoT world
-* connect these Things to IoT devices
-* create a SAPUI5 Application for IoT using one of the SAP Web IDE templates
-* simulate data transmission using Postman
-* analyze collected data within the SAPUI5 application
+You are now able to:
+
+* create a new Data Model using IoT Service Cockpit
+* onboard Devices with Gateway Cloud using MQTT protocol
+* send Data with Paho MQTT Client
+* view Data via IoT Service Cockpit
 
 
 Please proceed with next exercise.
