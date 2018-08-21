@@ -5,7 +5,6 @@
 
 
 ## Description
-**This exercise is working in prgress**
 
 In this exercise, you’ll learn how to 
 
