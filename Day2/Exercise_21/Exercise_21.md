@@ -155,7 +155,8 @@ In this chapter you are going to see how to implement Virtual Data Model in your
 	```java
 	final List<BPDetails> result;
 	```
-with the following and **save** the file
+	
+	with the following and **save** the file
 
 	```java
 	final List<BusinessPartner> result;
