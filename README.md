@@ -25,7 +25,7 @@ Side-by-Side Extensions for S/4HANA Cloud
 ### DAY 2
 Continue Side-by-Side Extensions for S/4HANA Cloud  
 
-- [(***WIP***) Exercise\_21 - Virtual Data Model (VDM)](Day2/Exercise_21/Exercise_21.md)
+- [Exercise\_21 - Virtual Data Model (VDM)](Day2/Exercise_21/Exercise_21.md)
 - [(***WIP***) Exercise\_22 - Develop a front-end application using Application Programming Model](Day2/Exercise_22/Exercise_22.md)
 
 Leonardo Internet of Things Foundation
