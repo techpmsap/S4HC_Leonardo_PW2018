@@ -121,7 +121,7 @@ Neo commands used during S/4HANA extension development are part of SAP Cloud Pla
 
  
 ### <a name="create-runtime-environment"></a>Create a new Neo Runtime Environment
-During Java application deployment to SAP Cloud Platform, you will be using Java EE 6 Web Server runtime.
+During Java application deployment to SAP Cloud Platform, you will be using Java EE 7 Web Server runtime.
 
 1. Download the latest version of Java EE 7 Web Profile TomEE 7 from here <https://tools.hana.ondemand.com/#cloud>  
 	![](images/07_02.png)
@@ -230,43 +230,59 @@ You might need Maven tool installed on you workstation. Here are the steps to in
 
 ### <a name="check-eclipse-maven"></a>Check if Eclipse/Maven is installed and Java set-up is done correctly
 Building successfully a Maven-based Java project in your Eclipse is a prerequisite.
-You are ready to test if you can build and run a Java Web application project with Maven in your Eclipse IDE. For this test we prepared a Maven-based HelloWorld Java project you can import and run.
+You are ready to test if you can build and run a Java Web application project with Maven in your Eclipse IDE.
 
-1. Download the archive file [helloworld.zip](files/helloworld.zip?raw=true).
 
-1. Extract the *helloworld.zip* archive to a directory of your choice
+1. Be sure you have already created and set up a new Neo Runtime Environment as explained earlier
 
-1. From the Eclipse menu, choose **File -> Import…** to open the Import wizard  
+1. Open Eclipse
+
+1. Click on **File -> New -> Project...**  
 	![](images/20.png)
 
-1. Choose **Maven->Existing Maven Projects** and click **Next**  
+1. Choose **Maven -> Maven Project** and click **Next**  
 	![](images/21.png)
 
-1. In the Import Maven Projects dialog:
-	- Click **Browse** and select the helloworld directory where you have extracted the *helloworld.zip*
-	- The *helloworld/pom.xml* will be listed in the Projects section
-	- Select the checkbox of this *pom.xml*
-	- Choose **Finish** to start importing the Maven project into your Eclipse workspace
-	![](images/22.png)  
-	
-	>**Info**: POM is an acronym for Project Object Model. It is an XML representation of a Maven project held in a file named *pom.xml*. For more information see the Maven documentation.
+1. Click **Next**  
+	![](images/22.png)
 
-1. In the Project Explorer view of the Java EE Perspective you should find now the imported *helloworld*  
+1. Select the **Internal** catalog, choose the **maven-archetype-webapp** and click **Next**  
 	![](images/23.png)
 
-1. Right-click on the *helloworld* project node to open the Context Menu. Choose **Run As -> Maven install** to start the Maven build for the *helloworld* project  
+1. Enter
+ 
+	| Parameter | Value |
+	| ----------| ----- |
+	| Group ID | com.sap.test |
+	| Artifact ID | TestMaven |
+	
+	and click **Finish**
+	 
 	![](images/24.png)
 
-1. The Eclipse IDE will open a Console Tab that displays the build progress. You should see **BUILD SUCCESS**. If your build was not successful, please check the troubleshooting guide for Maven  
+1. The project is created. Right click on the project name and choose **Properties**  
 	![](images/25.png)
 
-1. In Project Explorer view expand the project node **helloworld -> target** to find the built *helloworld.war* file.
-
-	> Note: To see it you might have to refresh the project by right-clicking on the project-node and press Refresh  
-	
+1. Select **Project Facets**, change the Java version to **1.8**, click on the **Runtimes** tab on the right-hand side, select the **Java EE 7 Web Profile TomEE 7** runtime and click on **Apply and Close**  
 	![](images/26.png)
+
+1. Now, if there were errors in the project, they should be gone. Right click on the *pom.xml* file and choose **Run As -> Maven build**  
+	![](images/26_02.png)
+
+1. Enter the goals **clean install** if required and click **Run**  
+	![](images/26_03.png)
+
+1. The Eclipse IDE will open a Console Tab that displays the build progress. You should see **BUILD SUCCESS**. If your build was not successful, please check the troubleshooting guide for Maven  
+	![](images/26_04.png)
+
+1. Right click on the project name and choose **Refresh**  
+	![](images/26_05.png)
+
+1. In Project Explorer view expand the project node **TestMaven -> target** to find the built *TestMaven.war* file  
 	
-1.  Maven has build successfully the *helloworld* Java web application and created a *helloworld.war* file (see console output for the location).
+	![](images/26_06.png)
+	
+1.  Maven has build successfully the *TestMaven* Java web application and created a *TestMaven.war* file (see console output for the location).
 
 
 ### <a name="eclipse-yml-plugin"></a>Install Eclipse YML plugin
