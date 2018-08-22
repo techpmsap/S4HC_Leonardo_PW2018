@@ -38,6 +38,7 @@ Here below are prerequisites required for the exercises in this workshop.
 1. [Sign up for SAP Cloud Platform Neo trial account](#sign-up-neo)
 1. [Sign up for SAP Cloud Platform Cloud Foundry trial account](#sign-up-cf)
 1. [Install Cloud Foundry CLI](#install-cf-cli)
+1. [Install ML Foundation CLI](#install-ml-cli)
 1. [Install Apache Maven for Windows/Mac](#install-maven)
 1. [Check if Eclipse/Maven is installed and Java set-up is done correctly](#check-eclipse-maven)
 1. [Install Eclipse YML plugin](#eclipse-yml-plugin)
@@ -225,6 +226,16 @@ Install Cloud Foundry CLI
 	![](images/19.png)
 
 1. Once downloaded the file, please install it by double clicking on the downloaded file.
+
+
+
+### <a name="install-ml-cli"></a>Install Machine Learning Foundation CLI
+Install Machine Learning Foundation CLI  
+
+1.	Machine Learning Foundation CLI can be downloaded here <https://tools.hana.ondemand.com/#mlfoundation>. Just select the installer which matches your Workstation's Operating System
+	![](images/19_02.png)
+
+1. Once downloaded the file, please install it following the instruction contained in the same page
 
 
 
