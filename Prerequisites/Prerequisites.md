@@ -123,7 +123,7 @@ Neo commands used during S/4HANA extension development are part of SAP Cloud Pla
 ### <a name="create-runtime-environment"></a>Create a new Neo Runtime Environment
 During Java application deployment to SAP Cloud Platform, you will be using Java EE 6 Web Server runtime.
 
-1. Download the latest version of Java EE 6 Web Profile from here <https://tools.hana.ondemand.com/#cloud>  
+1. Download the latest version of Java EE 7 Web Profile TomEE 7 from here <https://tools.hana.ondemand.com/#cloud>  
 	![](images/07_02.png)
 
 1. Extract it in a folder on your disk
@@ -131,13 +131,13 @@ During Java application deployment to SAP Cloud Platform, you will be using Java
 1.	From Eclipse Oxygen, go to **Preferences** window. Search for **runtime** and, under the path **Server -> Runtime Environments** click **Add**  
 	![](images/08.png)
 
-1.	Under **SAP** catalog, select **Java EE 6 Web Profile** and click **Next**  
+1.	Under **SAP** catalog, select **Java EE 7 Web Profile TomEE 7** and click **Next**  
 	![](images/09.png)
 
-1.	Browse to the location of the Java EE 6 Web Profile SDK folder you have just extracted and click **Finish**  
+1.	Browse to the location of the Java EE 7 Web Profile TomEE 7 folder you have just extracted and click **Finish**  
 	![](images/10.png)
 
-1.	Java EE 6 Web Profile is installed. Click on **Apply and Close**    
+1.	Java EE 7 Web Profile is installed. Click on **Apply and Close**    
 	![](images/10_02.png)
 
 
