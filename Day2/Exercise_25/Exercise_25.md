@@ -449,20 +449,24 @@ The workflow could be extended in the following ways, which are supported by Clo
 
 1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **Details** tab and enter the following values:
 
- |Parameter|Value|
-|---------|-----|
-|Display texts -> Subject|`${context.Device} (${context.DeviceId}): Confirm Service Request`|
-|Recipients -> Users|`${context.UserId}`|
+  |Parameter|Value|
+  |---------|-----|
+  |Display texts -> Subject|`${context.Device} (${context.DeviceId}): Confirm Service Request`|
+  |Recipients -> Users|`${context.UserId}`|
 
- ![](images/076.png)
+  ![](images/076.png) 
 
 1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **User Interface** tab and enter the following values:
-|HTML5 App Name|cpl265|
-|Component URL|webapp|
-|SAPUI5 Component|cpl265-service-request|
 
-When finished click on **Save**  
- ![](images/077.png)
+  |Parameter|Value|
+  |---------|-----|
+  |HTML5 App Name|cpl265|
+  |Component URL|webapp|
+  |SAPUI5 Component|cpl265-service-request| 
+
+  When finished click on **Save**. 
+  
+  ![](images/077.png) 
 
 
 #### --- Deploy to SAP Cloud Platform Workflow ---
