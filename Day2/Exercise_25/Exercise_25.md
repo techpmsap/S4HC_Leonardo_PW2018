@@ -455,7 +455,7 @@ The workflow could be extended in the following ways, which are supported by Clo
    |Display texts -> Subject|`${context.Device} (${context.DeviceId}): Confirm Service Request`|
    |Recipients -> Users|`${context.UserId}`| 
 
-   ![](images/076.png)  
+	![](images/076.png)
 
 1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **User Interface** tab and enter the following values: 
 
