@@ -12,13 +12,14 @@ In this exercise, you’ll go through the basic steps of setting up the developm
 
 * Application Developers
 * People interested in learning about 
-	- S/4HANA extension and SDK
-	- SAP Leonardo IoT & Machine Learning  
+	- S/4HANA Cloud extension and SDK
+	- SAP Leonardo Internet of Things Foundation
+	- SAP Leonardo Machine Learning Foundation 
 
 
 ## Goal
 
-The goal of this exercise is to have your workstation well prepared in order to attend to the S/4HANA Cloud Extension & SAP Leonardo workshop.
+The goal of this pre-requisite exercise is to have your workstation or laptop well prepared in order to attend to the *"Build innovative extension of S/4HANA Cloud with SAP Cloud Platform and SAP Leonardo Technologies Power Week"*.
 
 
 ## Prerequisites
@@ -59,11 +60,11 @@ Eclipse Oxygen IDE is required for Java application development during the works
 1.	Download and install **Eclipse Oxygen IDE for Java EE Developers**
 
 	#### For Windows:
-	<http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/3/eclipse-jee-oxygen-3-win32-x86_64.zip>  
+	<http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/3a/eclipse-jee-oxygen-3a-win32-x86_64.zip>  
 	![](images/01.png)
 
 	#### For Mac:
-	<http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/3/eclipse-jee-oxygen-3-macosx-cocoa-x86_64.dmg>  
+	<http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/oxygen/3a/eclipse-jee-oxygen-3a-macosx-cocoa-x86_64.dmg>  
 	![](images/02.png)
 
 
@@ -149,7 +150,7 @@ Neo commands used during S/4HANA extension development are part of SAP Cloud Pla
 	
 1. Extract it in a folder on your disk
 
-1. You will need this SDK in the Exercise 13 where you are going to start a Java Web Tomcat 8 server.
+1. You will need this SDK in the Exercise 14 where you are going to start a Java Web Tomcat 8 server.
 
 
 
