@@ -447,16 +447,16 @@ The workflow could be extended in the following ways, which are supported by Clo
 1. Click on the **Tasks** icon on the left side of the workflow editor and select **User Task**. A new task is created: drag & drop it just on top of the connection line between the start and the end events  
 	![](images/075.png)
 
-1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **Details** tab and enter the following values:
+1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **Details** tab and enter the following values: 
 
   |Parameter|Value|
   |---------|-----|
   |Display texts -> Subject|`${context.Device} (${context.DeviceId}): Confirm Service Request`|
-  |Recipients -> Users|`${context.UserId}`|
+  |Recipients -> Users|`${context.UserId}`| 
 
-  ![](images/076.png) 
+  ![](images/076.png)  
 
-1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **User Interface** tab and enter the following values:
+1. Be sure to have the new UserTask1 selected. On the right side, navigate to the **User Interface** tab and enter the following values: 
 
   |Parameter|Value|
   |---------|-----|
