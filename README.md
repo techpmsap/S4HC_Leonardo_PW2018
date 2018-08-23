@@ -4,7 +4,7 @@ Build innovative extension of S/4HANA Cloud with SAP Cloud Platform and SAP Leon
 
 # PREREQUISITES
 
-- [(***WIP***) Prerequisites for the exercises](Prerequisites/Prerequisites.md)
+- [Prerequisites for the exercises](Prerequisites/Prerequisites.md)
 
 # INDEX OF EXERCISES 
 
