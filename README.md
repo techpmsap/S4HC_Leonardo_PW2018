@@ -35,8 +35,8 @@ Multitenant Applications
 Leonardo Internet of Things Foundation
 
 - [(***WIP***) Exercise\_24 - End to End scenario using MQTT and Gateway Cloud](Day2/Exercise_24/Exercise_24.md)
-- [(***WIP***) Exercise\_25 - Maintenance Scenario using IoT to extend LoB](Day2/Exercise_25/Exercise_25.md)
-- [(***WIP***) Exercise\_26 - IoT Application Enablement](Day2/Exercise_26/Exercise_26.md)
+- [Exercise\_25 - Maintenance Scenario using IoT to extend LoB](Day2/Exercise_25/Exercise_25.md)
+- [Exercise\_26 - IoT Application Enablement](Day2/Exercise_26/Exercise_26.md)
 
 ### DAY 3
 Leonardo Machine Learning Foundation
