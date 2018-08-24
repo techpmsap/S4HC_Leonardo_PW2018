@@ -50,12 +50,11 @@ Here below are prerequisites required for the exercises in this workshop.
 
 ### <a name="laptop"></a> Bring Your Own Laptop with Admin Access
  
-Please bring the laptop that you have admin access for hands-on exercises.   
-
+Please bring the laptop that you have admin access for hands-on exercises.  You will need the admin right to setup the development environment for the exercises by installing or updating the software or configuring the setup.
 
 
 ### <a name="install-eclipse-oxygen"></a>Install Eclipse Oxygen
-Eclipse Oxygen IDE is required for Java application development during the workshop.
+Eclipse Oxygen IDE is required for Java application development during the workshop. You will create a SAP S/4HANA Cloud SDK project for Cloud Foundry from an archetype using the Eclipse IDE. 
 
 1.	Download and install **Eclipse Oxygen IDE for Java EE Developers**
 
@@ -70,7 +69,7 @@ Eclipse Oxygen IDE is required for Java application development during the works
 
 
 ### <a name="install-cp-oxygen-plugin"></a>Install SAP Cloud Platform Eclipse Oxygen Plugins
-Install SAP Cloud Platform Eclipse Oxygen Plugins
+Now that you have installed Eclipse, you need to install the SAP Cloud Platform tools for Java. This is done following the standard approach of Eclipse to install plugins.
 
 1.	Open **Eclipse Oxygen**
 1. Click on **Help -> Install New Software…**  
@@ -91,7 +90,8 @@ Install SAP Cloud Platform Eclipse Oxygen Plugins
 
 
 ### <a name="install-java-jdk"></a>Install Java JDK
-Eclipse IDE needs Java JDK.
+Eclipse IDE needs Java JDK. JDK (Java Development Kit) includes the JVM, standard class libraries, and several other tools that a developer needs in order to compile and run the Java program.
+
 
 1.	Download and install Java JDK from this link <http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>  
 	![](images/04.png)
@@ -107,7 +107,7 @@ For the workshop exercises you need to install the **Postman** application for C
 
 
 ### <a name="postman-interceptor"></a> Install Chrome Postman Interceptor application
-Another required tool is the Postman Interceptor app for Chrome. This can be found on the Chrome Web Store.
+Another required tool is the Postman Interceptor app for Chrome. This can be found on the Chrome Web Store. Postman Interceptor helps you send requests which use browser cookies through the Postman app. It can also send headers which are normally restricted by Chrome but are critical for testing APIs. The Interceptor makes this process painless.
 
 1. Navigate to <https://chrome.google.com/webstore/search/postman%20interceptor> and select the **Postman Interceptor** tool  
 	![](images/04_02b.png)
@@ -118,7 +118,7 @@ Another required tool is the Postman Interceptor app for Chrome. This can be fou
 
 
 ### <a name="install-nodejs"></a>Install NodeJS
-NodeJS is needed in the last exercise of Day 2. This is will also install the NodeJS Package Manager (npm). 
+NodeJS is needed in the exercise to secure Cloud Foundry application using the SAP Approuter component. Protect your Java microservice so that it only accepts requests based on a valid JSON Web Token (JWT), received from the Approuter. This will also install the NodeJS Package Manager (npm). 
 
 1. Close any Terminal window on your machine
 
@@ -221,7 +221,7 @@ Sign up also for SAP Cloud Platform Cloud Foundry trial account.
 
 
 ### <a name="install-cf-cli"></a>Install Cloud Foundry CLI
-Install Cloud Foundry CLI  
+Cloud Foundry CLI is the official command line client for Cloud Foundry. It provides a set of commands for managing your apps.  
 
 1.	Cloud Foundry CLI can be downloaded here <https://github.com/cloudfoundry/cli#downloads>. Just select the installer which matches your Workstation's Operating System
 	![](images/19.png)
@@ -231,7 +231,7 @@ Install Cloud Foundry CLI
 
 
 ### <a name="install-ml-cli"></a>Install Machine Learning Foundation CLI
-Install Machine Learning Foundation CLI  
+SAP Leonardo Machine Learning foundation Command Line Interface (CLI) is a way of interacting with the foundation and using its services, e.g. to simplify data upload for Retraining and Bring your Own Model scenarios as described in the official documentation.
 
 1.	Machine Learning Foundation CLI can be downloaded here <https://tools.hana.ondemand.com/#mlfoundation>. Just select the installer which matches your Workstation's Operating System
 	![](images/19_02.png)
@@ -241,7 +241,7 @@ Install Machine Learning Foundation CLI
 
 
 ### <a name="install-maven"></a>Install Apache Maven for Windows/Mac
-You might need Maven tool installed on you workstation. Here are the steps to install Maven.
+SAP offers a Maven plugin to support Java developers in using Maven to develop SAP Cloud Platform applications. You need Maven tool installed on you workstation. Here are the steps to install Maven.
 
 #### WINDOWS
 
@@ -333,9 +333,9 @@ You are ready to test if you can build and run a Java Web application project wi
 
 
 ### <a name="eclipse-yml-plugin"></a>Install Eclipse YML plugin
-1. It's important for the next exercises to install an Eclipse plugin which allows us to easily manage **YAML** files. 
+It's important for the exercises to install an Eclipse plugin which allows us to easily manage **YAML** files. 
 
-2. Open Eclipse IDE and click on **Help -> Eclipse Marketplace...**  
+1. Open Eclipse IDE and click on **Help -> Eclipse Marketplace...**  
 	![](images/27.png)
 
 1. Enter the text "**yml**" in the search box and install the **YEdit** plugin  
@@ -354,7 +354,7 @@ You are ready to test if you can build and run a Java Web application project wi
 
 ### <a name="rdc"></a> Remote Desktop Connection
  
-In order to connect with the Virtual Machines we have prepared for you, you need to have the Remote Desktop Connection (RDC) tool installed on your machine. For Windows users, RDC comes already installed, so if you have Windows you don't have to worry about it. If you are MAC user, instead, you can download it for free from the Mac App Store.  
+In order to connect with the Virtual Machines, we have prepared for you, you need to have the Remote Desktop Connection (RDC) tool installed on your machine. For Windows users, RDC comes already installed, so if you have Windows you don't have to worry about it. If you are MAC user, instead, you can download it for free from the Mac App Store.  
 	![](images/32.png)
 
 
