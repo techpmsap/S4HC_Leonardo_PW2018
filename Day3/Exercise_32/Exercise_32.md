@@ -1,4 +1,5 @@
 <table width=100% border=>
+<tr><td colspan=2><img src="images/spacer.png"></td></tr>
 <tr><td colspan=2><h1>EXERCISE 3_2 - ML Use Case 1 - Pretrained service consumption</h1></td></tr>
 <tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;30 min</h1></td></tr>
 </table>
@@ -90,7 +91,7 @@ Required resources for this step:
 1. This will open up the SAP Web IDE. 
 	![](images/06.png)
 
-1. Click on the **Development** tab on the left toolbar. If you see that there is already a project named *MLFSAPUI5\_Project\_Exercise* in the workspace, please right click on its name and choose **Delete**  
+1. Click on the **Development** tab on the left toolbar. If you see that there is already a project named *MLFSAPUI5\_Project\_Exercise* in the workspace, please right click on its name and choose **Edit -> Delete**  
 	![](images/07.png)
 
 1. You should start with a completely empty workspace like the one in the picture  
@@ -208,8 +209,7 @@ For the exercises where we develop SAPUI5 and Java applications, we will work wi
 
 1. Before we proceed with editing the *settings.json*, we need to get the **API Key** for the ML services from the API Business Hub, explained in the next steps
 
-1.	Go to <https://api.sap.com> and click on **Try New Design**
-	![](images/29.png)
+1.	Go to <https://api.sap.com>
 
 1.	Click on the **Log On** button on the top right corner and login with the credentials provided by your instructor  
 	![](images/30.png)
@@ -224,17 +224,13 @@ For the exercises where we develop SAPUI5 and Java applications, we will work wi
 	![](images/33.png)
 
 1. Now go back to your SAP Web IDE in SAP Cloud Platform, where the *settings.json* is still open.
-For the two urls "Image Classification" and "Product Image Classification" replace the 
-**<<<< COPY YOUR API KEY >>>>**  with the API key you copied in the clipboard and **save** the file
+Replace the **<<<< COPY YOUR API KEY >>>>** string with the API key you copied in the clipboard and **save** the file
 	![](images/34.png)
 
 1.	Click on the **Run** icon on the toolbar to execute the application   
 	![](images/35.png)
 
-1. An application with two tiles comes up. Select the tile with the title **Image Classification**
-	![](images/36.png)
-
-1. Extract the 4 images contained in the zip file ([test_images.zip](files/test_images.zip?raw=true)) you have downloaded already as explained in the prerequisites  
+1. The application comes up. Extract the 4 images contained in the zip file ([test_images.zip](files/test_images.zip?raw=true)) you have downloaded already as explained in the prerequisites  
 
 1. Select the *tennis_ball.jph* image and drag & drop it onto the camera icon
 	![](images/37.png)
