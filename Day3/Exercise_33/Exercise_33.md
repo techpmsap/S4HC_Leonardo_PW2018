@@ -1,4 +1,5 @@
 <table width=100% border=>
+<tr><td colspan=2><img src="images/spacer.png"></td></tr>
 <tr><td colspan=2><h1>EXERCISE 3_3 - ML Foundation in SAP Cloud Foundry - Preparation</h1></td></tr>
 <tr><td><h3>SAP Partner Workshop</h3></td><td><h1><img src="images/clock.png"> &nbsp;60 min</h1></td></tr>
 </table>
@@ -36,21 +37,8 @@ You used the Cloud Foundry user to access the SAP API Business Hub and the SAP C
 Organization and space will be automatically configured and made available during the login process as there is just one space and org for each user.
 
 
-|Parameter   |Value                                                |
-|------------|-----------------------------------------------------|
-|Username    |ml-train+XX@sap.com                                  |
-|Password    |\<specific to your username\> provided by the trainer|
-|API endpoint|api.cf.eu10.hana.ondemand.com                        |
-|Organization|ml-trainXX (same as your user name without the +)    |
-|Space       |ml-trainXX (same as your user name without the +)    |
-
-
-1. Open Firefox as Chrome will use SSO for SAP Employees. Login to SAP Cloud Platform Cockpit via <https://account.hana.ondemand.com/cockpit>. Login with your given e-Mail 
-**ml-train+XX@sap.com**, where **XX** must be replaced by your workstation ID, and the password provided by the trainer  
+1. Open Firefox as Chrome will use SSO for SAP Employees. Login to SAP Cloud Platform Cockpit via <https://account.hana.ondemand.com/cockpit>. Login with the credentials provided by your instructor. The user name will be in the form of an email as **ml-train+XX@sap.com**, where **XX** must be replaced by your workstation ID  
 	![](images/01.png)
-
-1.	Navigate to **Regions -> Cloud Foundry Environment > Europe (Frankfurt)**  
-	![](images/02.png)
 
 1.	Click on your global account **SAP\_ML\_Demo**  	![](images/03.png)
 
