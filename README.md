@@ -43,8 +43,8 @@ Leonardo Machine Learning Foundation
 
 - [Exercise\_31 - ML APIs Exploration](Day3/Exercise_31/Exercise_31.md)
 - [Exercise\_32 - ML Use Case 1 - Pretrained service consumption](Day3/Exercise_32/Exercise_32.md)
-- [(***WIP***) Exercise\_33 - ML Foundation in SAP Cloud Foundry - Preparation](Day3/Exercise_33/Exercise_33.md)
-- [(***WIP***) Exercise\_34 - ML Use Case 2 - Retrainable services](Day3/Exercise_34/Exercise_34.md)
+- [Exercise\_33 - ML Foundation in SAP Cloud Foundry - Preparation](Day3/Exercise_33/Exercise_33.md)
+- [Exercise\_34 - ML Use Case 2 - Retrainable services](Day3/Exercise_34/Exercise_34.md)
 - [(***WIP***) Exercise\_35 - ML Use Case 3 - Bring your own model](Day3/Exercise_35/Exercise_35.md)
 
 ### Appendix

@@ -54,10 +54,6 @@ where **XX** needs to be replaced by your workstation ID, e.g. if your workstati
 
 Please make sure that you work with the correct username to avoid conflicts with other participants. Take note of the following credentials, you will be using them during all exercises. 
 
-|Parameter|Value                                              |
-|---------|---------------------------------------------------|
-|Username |ml-train+XX@sap.com                                |
-|Password |\<specific to your username\> provided by the trainer|
 
 
 ### <a name="setup-dev-env"></a> Setup the Development Environment
