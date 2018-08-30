@@ -1,7 +1,0 @@
-, {
-			"name": "Retrained Image Classifier",
-			"url": "/retraining/models/<your_model_name>/versions/<version>",
-			"headers": {
-				"Authorization": "<<<< YOUR BEARER TOKEN >>>>"
-			}
-		}

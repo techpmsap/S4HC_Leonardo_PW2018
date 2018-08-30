@@ -66,7 +66,7 @@ The first operation is to push the retraining app to CF. This will be used later
 	```sh
 	cf login -a <YOUR_API_ENDPOINT>  -u <YOUR_CLOUD_FOUNDRY_USER>
 	```
-where **\<YOUR\_API\_ENDPOINT\>** is the hostname you can read when you go inside your subaccount on your Cloud Platform environment and **\<YOUR\_CLOUD\_FOUNDRY\_USER\>** is the username provided by your instructor. When running this command you will be requested to enter the related password and to choose the right organization. Please choose the organization named **ml_train_XX** where **XX** is your workstation ID
+where **\<YOUR\_API\_ENDPOINT\>** is the hostname you can read when you go inside your subaccount on your Cloud Platform environment and **\<YOUR\_CLOUD\_FOUNDRY\_USER\>** is the username provided by your instructor. When running this command you will be requested to enter the related password and to choose the right organization. Please choose the organization named **ml\_train\_XX** where **XX** is your workstation ID
 	![](images/03.png)
 
 1. Once done, enter the command `cf push` to push the Cloud Foundry application to your Cloud Foundry space

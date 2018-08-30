@@ -1,9 +1,0 @@
-#
-#Tue Jun 26 13:41:24 UTC 2018
-Name=retraining
-URL=https\://mlfproduction-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification
-ProxyType=Internet
-Type=HTTP
-WebIDEEnabled=true
-Authentication=NoAuthentication
-Description=Retraining
