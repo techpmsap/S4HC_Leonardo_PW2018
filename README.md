@@ -26,7 +26,7 @@ Side-by-Side Extensions for S/4HANA Cloud
 Continue Side-by-Side Extensions for S/4HANA Cloud  
 
 - [Exercise\_21 - Virtual Data Model (VDM)](Day2/Exercise_21/Exercise_21.md)
-- [(***WIP***) Exercise\_22 - Develop a front-end application using Application Programming Model](Day2/Exercise_22/Exercise_22.md)
+- [Exercise\_22 - Develop a front-end application using Application Programming Model](Day2/Exercise_22/Exercise_22.md)
 
 Multitenant Applications
 
