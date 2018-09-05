@@ -615,6 +615,7 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 	![](images/75.png)
 
 1. The frontend application opens and should show you the list of business partners retrieved from the service you defined
+	![](images/76.png)
 
 1. Congratulations! You have successfully completed the exercise
 
