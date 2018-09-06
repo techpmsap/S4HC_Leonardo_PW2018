@@ -30,10 +30,19 @@ The goal of this exercise is to create a frontend application for your service u
 Here below are prerequisites for this exercise.
 
 * A trial account on the SAP Cloud Platform. You can get one by registering [here](https://account.hanatrial.ondemand.com)
-* Java JDK 8
-* The source code created in the previous exercise
+* Previous exercises completed
 * A S/4HANA system with a working communication arrangement for the Business Partners collection
+* Change the Destination you defined [here](https://github.com/techpmsap/S4HC_Leonardo_PW2018/blob/master/Day1/Exercise_15/Exercise_15.md#-deploy-your-application-to-neo-and-configure-the-destination) by adding 3 further additional properties
 
+	| Property | Value |
+	| -------- | ----- |
+	| WebIDEEnabled | True |
+	| WebIDESystem| ErpQueryEndpoint |
+	| WebIDEUsage | odata_gen |
+	![](images/pre01.png)
+
+* Write down your Cloud Foundry API Endpoint which you can get by navigating here [here](https://account.hanatrial.ondemand.com), clicking on the **Cloud Foudry Trial** tile and then on the **trial** one. This will be used along with this exercise
+	![](images/pre02.png)
 
 
 ## Steps
@@ -44,6 +53,9 @@ Here below are prerequisites for this exercise.
 1. [Build and deploy the project](#build-deploy)
 1. [Add some annotations to the service](#add-annotations)
 1. [Create the front end application, build and deploy again](#frontend-application)
+
+
+
 
 ### <a name="new-application"></a>Create a new application with the Programming Model template
 
