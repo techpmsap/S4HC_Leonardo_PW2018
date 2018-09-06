@@ -120,31 +120,31 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 
 ### <a name="external-service"></a>Integrate an external service in the project
 
-1. We want now to use an external service like the one for retrieving Business Partners from S/4HANA Cloud. This service is the same we used in the previous exercises. In order to include it in our project we need to right click on the *srv* folder and choose **New -> Data Model from External Service**
+1. We want now to use an external service like the one for retrieving Business Partners from S/4HANA Cloud. This service is the same we used in the previous exercises. In order to include it in our project we need to right click on the *srv* folder and choose **New -> Data Model from External Service**  
 	![](images/19.png)
 
-1. Select **Service URL**, locate the destination named **ErpQueryEndpoint** (pay attention that this destination is the same we defined in the exercise "Retrieving data from S/4HANA and deploying to NEO", so it should be already in place), enter the path `/sap/opu/odata/sap/API_BUSINESS_PARTNER`, click on the **Test** button, verify that the service is available and click on **Next**
+1. Select **Service URL**, locate the destination named **ErpQueryEndpoint** (pay attention that this destination is the same we defined in the exercise "Retrieving data from S/4HANA and deploying to NEO", so it should be already in place), enter the path `/sap/opu/odata/sap/API_BUSINESS_PARTNER`, click on the **Test** button, verify that the service is available and click on **Next**  
 	![](images/20.png)
 
-1. Deselect the "Generate Virtual Data Model classes" checkbox and click on **Finish**
+1. Deselect the "Generate Virtual Data Model classes" checkbox and click on **Finish**  
 	![](images/21.png)
 
-1. After a while your service model will be created
+1. After a while your service model will be created  
 	![](images/22.png)
 
-1. You should see something like this in your SAP Web IDE
+1. You should see something like this in your SAP Web IDE  
 	![](images/23.png)
 
-1. For the scope of this project we don't need the *db* module, so we can get rid of it by simply right clicking on it and selecting **Edit -> Delete**. The *db* module will be remove from the project
+1. For the scope of this project we don't need the *db* module, so we can get rid of it by simply right clicking on it and selecting **Edit -> Delete**. The *db* module will be remove from the project  
 	![](images/24.png)
 
-1. This is what you should see after this operation
+1. This is what you should see after this operation  
 	![](images/25.png)
 
-1. Let's now define our Business Partners service. Double click on the *my-service.cds* file to open it in the editor
+1. Let's now define our Business Partners service. Double click on the *my-service.cds* file to open it in the editor  
 	![](images/26.png)
 
-1. Replace its content the following code and save the file. As you can see we are loading the service definitions from the file *./external/csn/API\_BUSINESS\_PARTNER*. Based on this file we are exposing 4 fields in our service and we are also telling to the service provider that we are going to define **custom handlers** for CRUD requests - we will see this in a bit e.g.: @Read(serviceName = "CrudService", entity = "BusinessPartner") - by specifying the statement **@cds.persistence.skip**
+1. Replace its content the following code and save the file. As you can see we are loading the service definitions from the file *./external/csn/API\_BUSINESS\_PARTNER*. Based on this file we are exposing 4 fields in our service and we are also telling to the service provider that we are going to define **custom handlers** for CRUD requests - we will see this in a bit e.g.: @Read(serviceName = "CrudService", entity = "BusinessPartner") - by specifying the statement **@cds.persistence.skip**  
 
 	```
 	using API_BUSINESS_PARTNER as bp from './external/csn/API_BUSINESS_PARTNER';
@@ -161,7 +161,7 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 	```
 	![](images/27.png)
 
-1. After a while you should receive the message **Build of "/bpr_bam" completed.**
+1. After a while you should receive the message **Build of "/bpr_bam" completed.**  
 	![](images/28.png)
 
 
@@ -169,28 +169,28 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 
 ### <a name="crud-classes"></a>Create the custom CRUD classes
 
-1. Locate the *bpr\_bam* folder under the path *bpr_bam/srv/src/main/java/com/sap/sample/* and, right clicking on it, choose **New -> Folder**
+1. Locate the *bpr\_bam* folder under the path *bpr_bam/srv/src/main/java/com/sap/sample/* and, right clicking on it, choose **New -> Folder**  
 	![](images/29.png)
 
-1. Create a folder named *commands*
+1. Create a folder named *commands*  
 	![](images/30.png)
 
-1. Create another named *crud*
+1. Create another named *crud*  
 	![](images/31.png)
 
-1. Right click on the *commands* folder and create a couple of new Java classes by choosing **New -> Java Class**
+1. Right click on the *commands* folder and create a couple of new Java classes by choosing **New -> Java Class**  
 	![](images/32.png)
 
-1. Name these two classes as *BusinessPartnerReadByKeyCommand* and *BusinessPartnerReadCommand*
+1. Name these two classes as *BusinessPartnerReadByKeyCommand* and *BusinessPartnerReadCommand*  
 	![](images/33.png)
 
-1. Create another Java class under the *crud* folder
+1. Create another Java class under the *crud* folder  
 	![](images/34.png)
 
-1. Name this class as *BusinessPartnerRead*
+1. Name this class as *BusinessPartnerRead*  
 	![](images/35.png)
 
-1. This is what you should get at the end of this process
+1. This is what you should get at the end of this process  
 	![](images/36.png)
 
 1. Now, double click on the *BusinessPartnerReadByKeyCommand*, enter the following content and save the file
@@ -357,7 +357,7 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 
 	![](images/39.png)
 
-1. As a final step, before we build the project, we need to adjust the deployment settings. So double click on the *mta.yaml* file to open it in the editor
+1. As a final step, before we build the project, we need to adjust the deployment settings. So double click on the *mta.yaml* file to open it in the editor  
 	![](images/40.png)
 
 1. Adapt the code in this file as the following (you could also copy & paste this in there) and save the file
@@ -395,41 +395,41 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 
 
 ### <a name="build-deploy"></a>Build and deploy the project
-1. We can build the project. Right click on the project's name and choose **Build -> Build** 
+1. We can build the project. Right click on the project's name and choose **Build -> Build**  
 	![](images/42.png)
 
-1. After a while, you should receive a "BUILD SUCCESS" message
+1. After a while, you should receive a "BUILD SUCCESS" message  
 	![](images/43.png)
 
-1. A new folder named *mta_archives* should be available in the project exporer of your SAP Web IDE
+1. A new folder named *mta_archives* should be available in the project exporer of your SAP Web IDE  
 	![](images/44.png)
 
-1. Right click on the *bpr\_bam\_0.0.1.mtar* package located under this folder and choose **Deploy -> Deploy to SAP Cloud Platform**
+1. Right click on the *bpr\_bam\_0.0.1.mtar* package located under this folder and choose **Deploy -> Deploy to SAP Cloud Platform**  
 	![](images/45.png)
 
-1. Enter your **Cloud Foundry API Endpoint** with your credentials and click **Deploy**
+1. Enter your **Cloud Foundry API Endpoint** with your credentials and click **Deploy**  
 	![](images/46.png)
 
-1. After a few minutes the deployment ends and you should receive a message with a button to go straight to the service. Click on the **Open** button
+1. After a few minutes the deployment ends and you should receive a message with a button to go straight to the service. Click on the **Open** button  
 	![](images/47.png)
 
-1. A new browser page opens up, showing the content of this service. It reports all the available OData Endpoints. For this service we have just one: click on its link
+1. A new browser page opens up, showing the content of this service. It reports all the available OData Endpoints. For this service we have just one: click on its link  
 	![](images/48.png)
 
-1. The endpoint is reached and its definition is shown
+1. The endpoint is reached and its definition is shown  
 	![](images/49.png)
 
-1. If you append the "BusinessPartner" entity name to this OData Endpoint you will get the list of all available business partners coming from the service
+1. If you append the "BusinessPartner" entity name to this OData Endpoint you will get the list of all available business partners coming from the service  
 	![](images/50.png)
 
 
 
 
 ### <a name="add-annotations"></a>Add some annotations to the service
-1. Before we create our frontend application with the List Report template, we want to create some OData annotations directly on the main service. To do this, right click on the *srv* folder and choose **New -> File**
+1. Before we create our frontend application with the List Report template, we want to create some OData annotations directly on the main service. To do this, right click on the *srv* folder and choose **New -> File**  
 	![](images/51.png)
 
-1. Enter *main-annotations-cds* as the name for this new file and click **OK**
+1. Enter *main-annotations-cds* as the name for this new file and click **OK**  
 	![](images/52.png)
 
 1. Enter the following content for this file and save it. We are simply annotating two data fields under the UI.LineItem annotation
@@ -453,25 +453,25 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 
 ### <a name="frontend-application"></a>Create the front end application, build and deploy again
 
-1. Now let's create our frontend application. Right click on the *bpr\_bam* project and choose **New -> HTML5 Module**
+1. Now let's create our frontend application. Right click on the *bpr\_bam* project and choose **New -> HTML5 Module**  
 	![](images/54.png)
 
-1. Under the **Featured** category, choose the **List Report Application** template and click **Next**
+1. Under the **Featured** category, choose the **List Report Application** template and click **Next**  
 	![](images/55.png)
 
-1. Enter "frontend" for both **Module Name** and **Title** fields and click **Next**
+1. Enter "frontend" for both **Module Name** and **Title** fields and click **Next**  
 	![](images/56.png)
 
-1. Select **Current Project** as the data source and check that you are able to see the **CrudService** you defined earlier. Then click **Next**
+1. Select **Current Project** as the data source and check that you are able to see the **CrudService** you defined earlier. Then click **Next**  
 	![](images/57.png)
 
-1. Click **Next**
+1. Click **Next**  
 	![](images/58.png)
 
-1. Choose **BusinessPartner** as OData Collection and click **Finish**
+1. Choose **BusinessPartner** as OData Collection and click **Finish**  
 	![](images/59.png)
 
-1. This is what you should get at the end
+1. This is what you should get at the end  
 	![](images/60.png)
 
 1. Open the *mta.yaml* file in the editor and adjust the *frontend* module as the following. Pay attention to modify the URL in the **TENANT\_HOST\_PATTERN** according to your Cloud Foundry API Endpoint. Save the file
@@ -499,34 +499,34 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 	```
 	![](images/61.png)
 
-1. Let's build the project again. Right click on the project's name and choose **Build -> Build**
+1. Let's build the project again. Right click on the project's name and choose **Build -> Build**  
 	![](images/62.png)
 
-1. Your build process should finish successfully
+1. Your build process should finish successfully  
 	![](images/63.png)
 
-1. Since we have only 2GB of space in our Cloud Foundry Trial Landscape, we need to go on the cockpit and temporarily stop the builder application. Stop it and go back to SAP Web IDE
+1. Since we have only 2GB of space in our Cloud Foundry Trial Landscape, we need to go on the cockpit and temporarily stop the builder application. Stop it and go back to SAP Web IDE  
 	![](images/64.png)
 
-1. Right click on the *bpm\_bam\_0.0.1.mtar* file and choose **Deploy -> Deploy to SAP Cloud Platform**
+1. Right click on the *bpm\_bam\_0.0.1.mtar* file and choose **Deploy -> Deploy to SAP Cloud Platform**  
 	![](images/65.png)
 
-1. Enter again your **Cloud Foundry API Endpoint** and the related credentials and click **Deploy**
+1. Enter again your **Cloud Foundry API Endpoint** and the related credentials and click **Deploy**  
 	![](images/66.png)
 
-1. After some minutes the deployment ends and you get the chance to open the just deployed frontend application directly from SAP Web IDE. Click on the **Open** button for the frontend application
+1. After some minutes the deployment ends and you get the chance to open the just deployed frontend application directly from SAP Web IDE. Click on the **Open** button for the frontend application  
 	![](images/67.png)
 
-1. The frontend application is opened. Enter your SAP Cloud Platform credentials and click **Log On**
+1. The frontend application is opened. Enter your SAP Cloud Platform credentials and click **Log On**  
 	![](images/68.png)
 
-1. The launch pad is shown. Click on the **frontend** tile
+1. The launch pad is shown. Click on the **frontend** tile  
 	![](images/69.png)
 
-1. The List Report application is shown. Notice that you can already see in the list header the two fields we  defined in the annotation file earlier. Click on **Go**
+1. The List Report application is shown. Notice that you can already see in the list header the two fields we  defined in the annotation file earlier. Click on **Go**  
 	![](images/70.png)
 
-1. The list of business partners is shown (many are empty because they simply don't have any LastName and FirstName)
+1. The list of business partners is shown (many are empty because they simply don't have any LastName and FirstName)  
 	![](images/71.png)
 
 1. Congratulations! You have successfully completed the exercise.
