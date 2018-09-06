@@ -7,7 +7,7 @@
 ## Description
 In this exercise, you’ll learn how to 
 
-* create a new application using the Business Application Programming Model template
+* create a new application using the Application Programming Model template
 * create a service and a frontend application with SAP Web IDE Full-Stack.
 
 
@@ -23,7 +23,7 @@ For further reading on SAP S/4HANA Cloud SDK, click link below.
 
 ## Goal
 
-The goal of this exercise is to create a frontend application for your service using the Business Application Programming Model template in SAP Web IDE Full-Stack.  
+The goal of this exercise is to create a frontend application for your service using the Application Programming Model template in SAP Web IDE Full-Stack.  
 
 ## Prerequisites
   
@@ -31,26 +31,23 @@ Here below are prerequisites for this exercise.
 
 * A trial account on the SAP Cloud Platform. You can get one by registering [here](https://account.hanatrial.ondemand.com)
 * Java JDK 8
-* Cloud Foundry CLI [download it here](https://github.com/cloudfoundry/cli)
 * The source code created in the previous exercise
 * A S/4HANA system with a working communication arrangement for the Business Partners collection
 
 
+
 ## Steps
 
-1. [Create a new application with the Business Programming Model template](#new-application)
-1. [Use previous code in Business Programming Model application](#use-code)
-1. [Build the project](#build-project)
-1. [Deploy the project](#deploy-project)
-1. [Add the frontend module](#frontend-module)
-1. [Build and deploy to backend system with some final adjustments](#build-deploy)
+1. [Create a new application with the Programming Model template](#new-application)
+1. [Integrate an external service in the project](#external-service)
+1. [Create the custom CRUD classes](#crud-classes)
+1. [Build and deploy the project](#build-deploy)
+1. [Add some annotations to the service](#add-annotations)
+1. [Create the front end application, build and deploy again](#frontend-application)
 
+### <a name="new-application"></a>Create a new application with the Programming Model template
 
-
-
-### <a name="new-application"></a>Create a new application with the Business Programming Model template
-
-In this chapter you are going to see how to use SAP Web IDE to create a new application with the Business Application Programming Model. 
+In this chapter you are going to see how to use SAP Web IDE to create a new application with the Application Programming Model. 
 
 1. Login to the Trial Landscape <https://account.hanatrial.ondemand.com/cockpit> with your credentials  
 	![](images/01.png)
@@ -91,535 +88,438 @@ In this chapter you are going to see how to use SAP Web IDE to create a new appl
 1. In the Workspace now you can see your new project  
 	![](images/13.png)
 
-
-
-### <a name="use-code"></a>Use previous code in Business Programming Model application
-
-1. First of all, double click on the *pom.xml* file under the *bpr_bam/srv* folder and, just after the "properties" tag, add the following **dependencies**. Then save the file. Here we are adding some required dependencies for the Java service that we are going to create
-
-	```xml
-	<dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-   			<artifactId>lombok</artifactId>
-   			<version>LATEST</version>
-		</dependency>
-	</dependencies>
-	```
+1. Your project is ready: we can build it. In order to do this we need to configure a builder. Right click on the name of the project and choose **Project -> Project Settings**  
 	![](images/14.png)
 
-1. Now, expand the *bpr_bam/srv/src/main/java/com/sap/sample/bpr_bam* folder, right click on the *bpr_bam* leaf and choose **New -> Java Class** to create a new Java class in this folder  
+1. Go to the **Cloud Foundry** section and select **Use the following Cloud Foundry configuration**. Choose your API Endpoint (it should be the same you can see when you look at your Subaccount details in the cockpit; then click on **Install Builder**  
 	![](images/15.png)
 
-1. Name this class as *GetCachedBPCommand* and click **Next**  
+1. After a while, the builder will be installed. Click on the **Save** button. You can also click on **Close** to close this page  
 	![](images/16.png)
 
-1. Click **Finish**  
+1. If you look in your Cloud Foundry space now, you should see the builder application (it has a strange name, don't worry about it!) up and running  
 	![](images/17.png)
 
-1. Double click on the *GetCachedBPCommand.java* file to open it in the editor  
+1. Go back to SAP Web IDE and enable the Console with **View -> Console** if not yet enabled  
 	![](images/18.png)
 
-1. Replace the class, without removing the package name, with the following content. This is exactly the same code we used in Eclipse in the previous exercise. Remember to save the file and don't care about some red errors you see in the editor
 
-	```java
-	import java.util.Collections;
-	import java.util.List;
-	
-	import com.google.common.cache.Cache;
-	import com.google.common.cache.CacheBuilder;
-	
-	import com.sap.cloud.sdk.cloudplatform.cache.CacheKey;
-	import com.sap.cloud.sdk.odatav2.connectivity.ODataException;
-	import com.sap.cloud.sdk.odatav2.connectivity.ODataExceptionType;
-	import com.sap.cloud.sdk.s4hana.connectivity.CachingErpCommand;
-	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
-	
-	import lombok.NonNull;
-	
-	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
-	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
-	
-	public class GetCachedBPCommand extends CachingErpCommand<List<BusinessPartner>>
-	{
-	    private static final Cache<CacheKey, List<BusinessPartner>> cache =
-	            CacheBuilder.newBuilder().build();
-	
-	    public GetCachedBPCommand( @NonNull final ErpConfigContext configContext )
-	    {
-	        super(GetCachedBPCommand.class, configContext);
-	    }
-	
-	    @Override
-	    protected Cache<CacheKey, List<BusinessPartner>> getCache()
-	    {
-	        return cache;
-	    }
-	
-	    @Override
-	    protected List<BusinessPartner> runCacheable() throws ODataException {
-	        try {
-	        	final  List<BusinessPartner> businessPartners = new DefaultBusinessPartnerService().getAllBusinessPartner()
-	        	        .select(BusinessPartner.BUSINESS_PARTNER,
-	        	                BusinessPartner.BUSINESS_PARTNER_NAME,
-	        	                BusinessPartner.BUSINESS_PARTNER_CATEGORY,
-	        	                BusinessPartner.BUSINESS_PARTNER_GROUPING,
-	        	                BusinessPartner.LAST_NAME,
-	        	                BusinessPartner.FIRST_NAME)
-	        	        .top(100)
-	        	        .execute(getConfigContext());
-	        	
-	            return businessPartners;
-	        }
-	        catch( final Exception e) {
-	            throw new ODataException(ODataExceptionType.OTHER, "Failed to get Business Partners from OData command.", e);
-	        }
-	    }
-	
-	    @Override
-	    protected List<BusinessPartner> getFallback() {
-	        return Collections.emptyList();
-	    }
-	}
-	```
+
+
+### <a name="external-service"></a>Integrate an external service in the project
+
+1. We want now to use an external service like the one for retrieving Business Partners from S/4HANA Cloud. This service is the same we used in the previous exercises. In order to include it in our project we need to right click on the *srv* folder and choose **New -> Data Model from External Service**
 	![](images/19.png)
 
-1. Once saved the file, refresh your browser to see the errors gone  
+1. Select **Service URL**, locate the destination named **ErpQueryEndpoint** (pay attention that this destination is the same we defined in the exercise "Retrieving data from S/4HANA and deploying to NEO", so it should be already in place), enter the path `/sap/opu/odata/sap/API_BUSINESS_PARTNER`, click on the **Test** button, verify that the service is available and click on **Next**
 	![](images/20.png)
 
-1. Create a new Java class  
+1. Deselect the "Generate Virtual Data Model classes" checkbox and click on **Finish**
 	![](images/21.png)
 
-1. Name it as *GetCachedBPCategoryCommand*  
+1. After a while your service model will be created
 	![](images/22.png)
 
-1. Replace the generated class with the following code and save the file
-
-	```java
-	import java.util.Collections;
-	import java.util.List;
-	import java.util.concurrent.TimeUnit;
-	import com.google.common.cache.Cache;
-	import com.google.common.cache.CacheBuilder;
-	import com.sap.cloud.sdk.cloudplatform.cache.CacheKey;
-	import com.sap.cloud.sdk.odatav2.connectivity.ODataException;
-	import com.sap.cloud.sdk.odatav2.connectivity.ODataExceptionType;
-	import com.sap.cloud.sdk.s4hana.connectivity.CachingErpCommand;
-	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
-	import lombok.NonNull;
-	
-	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
-	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
-	
-	public class GetCachedBPByCategoryCommand extends CachingErpCommand<List<BusinessPartner>>
-	{
-	    @NonNull
-	    private final String bpCategory;
-	    public GetCachedBPByCategoryCommand (
-	            @NonNull final ErpConfigContext configContext,
-	            @NonNull final String bpCategory )
-	    {
-	        super(GetCachedBPByCategoryCommand.class, configContext);
-	        this.bpCategory = bpCategory;
-	    }
-	
-	    private static final Cache<CacheKey, List<BusinessPartner>> cache =
-	            CacheBuilder.newBuilder()
-	                    .maximumSize(100)
-	                    .expireAfterAccess(60, TimeUnit.SECONDS)
-	                    .concurrencyLevel(10)
-	                    .build();
-	
-	    @Override
-	    protected Cache<CacheKey, List<BusinessPartner>> getCache()
-	    {
-	        return cache;
-	    }
-	
-	    @Override
-	    protected CacheKey getCommandCacheKey()
-	    {
-	        return super.getCommandCacheKey().append(bpCategory);
-	    }
-	
-	    @Override
-	    protected List<BusinessPartner> runCacheable() throws ODataException {
-	        try {
-	        	final  List<BusinessPartner> businessPartners = new DefaultBusinessPartnerService().getAllBusinessPartner()
-	        	        .select(BusinessPartner.BUSINESS_PARTNER,
-	        	                BusinessPartner.BUSINESS_PARTNER_NAME,
-	        	                BusinessPartner.BUSINESS_PARTNER_CATEGORY,
-	        	                BusinessPartner.BUSINESS_PARTNER_GROUPING,
-	        	                BusinessPartner.LAST_NAME,
-	        	                BusinessPartner.FIRST_NAME)
-	        	        .top(100)
-	        	        .filter(BusinessPartner.BUSINESS_PARTNER_CATEGORY.eq(bpCategory))
-	        	        .execute(getConfigContext());
-	
-	            return businessPartners;
-	        }
-	        catch( final Exception e) {
-	            throw new ODataException(ODataExceptionType.OTHER, "Failed to get Business Partners from OData command.", e);
-	        }
-	    }
-	
-	    @Override
-	    protected List<BusinessPartner> getFallback() {
-	        return Collections.emptyList();
-	    }
-	}
-	
-	```
+1. You should see something like this in your SAP Web IDE
 	![](images/23.png)
 
-1.	Finally, let's create the *BPServlet* Java class  
+1. For the scope of this project we don't need the *db* module, so we can get rid of it by simply right clicking on it and selecting **Edit -> Delete**. The *db* module will be remove from the project
 	![](images/24.png)
 
-1. Replace the generated class with the same class you had in the *BPServlet.java* file in Eclipse  
+1. This is what you should see after this operation
 	![](images/25.png)
 
-1. Just pay attention to change the WebServlet endpoint to this
-
-	```java
-	@WebServlet("/odata/v2/CatalogService/businesspartners")
-	```
+1. Let's now define our Business Partners service. Double click on the *my-service.cds* file to open it in the editor
 	![](images/26.png)
 
-1. Your final class should look like this. Save the file 
+1. Replace its content the following code and save the file. As you can see we are loading the service definitions from the file *./external/csn/API\_BUSINESS\_PARTNER*. Based on this file we are exposing 4 fields in our service and we are also telling to the service provider that we are going to define **custom handlers** for CRUD requests - we will see this in a bit e.g.: @Read(serviceName = "CrudService", entity = "BusinessPartner") - by specifying the statement **@cds.persistence.skip**
 
-	```java
-	import com.google.gson.Gson;
-	import org.slf4j.Logger;
-	import javax.servlet.ServletException;
-	import javax.servlet.annotation.WebServlet;
-	import javax.servlet.http.HttpServlet;
-	import javax.servlet.http.HttpServletRequest;
-	import javax.servlet.http.HttpServletResponse;
-	import java.io.IOException;
-	import java.util.List;
-	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
-	import com.sap.cloud.sdk.cloudplatform.logging.CloudLoggerFactory;
+	```
+	using API_BUSINESS_PARTNER as bp from './external/csn/API_BUSINESS_PARTNER';
 	
-	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
-	
-	@WebServlet("/odata/v2/CatalogService/businesspartners")
-	public class BPServlet extends HttpServlet {
-	
-	    private static final long serialVersionUID = 1L;
-	    private static final Logger logger = CloudLoggerFactory.getLogger(BPServlet.class);
-	
-	    @Override
-	    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-	            throws ServletException, IOException
-	    {
-	    	final String bpCategory = request.getParameter("category");
-	    	
-	    	final ErpConfigContext configContext = new ErpConfigContext();
-	    	final List<BusinessPartner> result;
-	
-	    	if (bpCategory == null) result = new GetCachedBPCommand(configContext).execute();
-	    	else result = new GetCachedBPByCategoryCommand(configContext, bpCategory).execute();
-	    	response.setContentType("application/json");
-	    	response.getWriter().write(new Gson().toJson(result));
-	    }
+	service CrudService {
+		@cds.persistence.skip
+	     entity BusinessPartner as projection on bp.A_BusinessPartnerType{
+	      BusinessPartner,
+	      LastName,
+	      FirstName,
+	      BusinessPartnerCategory
+	     };
 	}
 	```
 	![](images/27.png)
 
-1. Open the file *my-service.cds*  
+1. After a while you should receive the message **Build of "/bpr_bam" completed.**
 	![](images/28.png)
 
-1. Let's define now our "businesspartners" service. This can be easily done inside a CDS file. Change the **CatalogService** service to look like this and save the file
 
-	```
-	service CatalogService {
-	
-		entity businesspartners {
-		    key BUSINESS_PARTNER : Integer;
-		    BUSINESS_PARTNER_NAME: String;
-		    BUSINESS_PARTNER_CATEGORY: String;
-		    BUSINESS_PARTNER_GROUPING: String;
-		    LAST_NAME: String;
-		    FIRST_NAME: String;
-		}
-	}
-	```
+
+
+### <a name="crud-classes"></a>Create the custom CRUD classes
+
+1. Locate the *bpr\_bam* folder under the path *bpr_bam/srv/src/main/java/com/sap/sample/* and, right clicking on it, choose **New -> Folder**
 	![](images/29.png)
 
-1.	We are quite ready to build and deploy our project, but first we have tp adjust some settings in the *mta.yaml* file. This is the file which instructs the system were and how to put the several modules included in the MTAR package generated by the build process  
+1. Create a folder named *commands*
 	![](images/30.png)
 
-1. Adapt the existing content to this and save the file. You can copy and paste the following code for the modules (do not change the first 3 lines)
-
-	```yml	
-	modules:
-	 - name: db
-	   type: hdb
-	   path: db
-	   parameters:
-	      memory: 128M
-	      disk-quota: 128M
-	      no-start: true
-	   requires:
-	    - name: hdi_db
-	
-	
-	 - name: srv
-	   type: java
-	   path: srv
-	   parameters:
-	      memory: 768M
-	      disk-quota: 1024M
-	   provides:
-	    - name: srv_api
-	      properties:
-	         url: ${default-url}
-	   requires:
-	    - name: hdi_db
-	      properties:
-	         JBP_CONFIG_RESOURCE_CONFIGURATION: '[tomcat/webapps/ROOT/META-INF/context.xml:
-	            {"service_name_for_DefaultDB" : "~{hdi-container-name}"}]'
-	    - name: bpr_destination
-	    - name: bpr_xsuaa
-		
-	resources:
-	 - name: hdi_db
-	   properties:
-	      hdi-container-name: ${service-name}
-	   type: com.sap.xs.hdi-container
-	 - name: bpr_destination
-	   type: destination
-	   description: Destination Service
-	 - name: bpr_xsuaa
-	   type: com.sap.xs.uaa
-	   description: XSUAA Service
-	```
+1. Create another named *crud*
 	![](images/31.png)
 
-
-
-### <a name="build-project"></a>Build the project
-
-1. Your project is ready: we can build it. In order to do this we need to configure a builder. Right click on the name of the project and choose **Project -> Project Settings**  
+1. Right click on the *commands* folder and create a couple of new Java classes by choosing **New -> Java Class**
 	![](images/32.png)
 
-1. Go to the **Cloud Foundry** section and select **Use the following Cloud Foundry configuration**. Choose your API Endpoint (it should be the same you can see when you look at your Subaccount details in the cockpit; then click on **Install Builder**  
+1. Name these two classes as *BusinessPartnerReadByKeyCommand* and *BusinessPartnerReadCommand*
 	![](images/33.png)
 
-1. After a while, the builder will be installed. Click on the **Save** button. You can also click on **Close** to close this page  
+1. Create another Java class under the *crud* folder
 	![](images/34.png)
 
-1. If you look in your Cloud Foundry space now, you should see the builder application (it has a strange name, don't worry about it!) up and running  
+1. Name this class as *BusinessPartnerRead*
 	![](images/35.png)
 
-1. Go back to SAP Web IDE and enable the Console with **View -> Console** if not yet enabled  
+1. This is what you should get at the end of this process
 	![](images/36.png)
 
-1. Right click on your project's name and choose **Build -> Build**. The build process starts  
+1. Now, double click on the *BusinessPartnerReadByKeyCommand*, enter the following content and save the file
+
+	```java
+	import com.netflix.hystrix.exception.HystrixBadRequestException;
+	import com.sap.cloud.sdk.odatav2.connectivity.ODataException;
+	import com.sap.cloud.sdk.s4hana.connectivity.ErpCommand;
+	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartnerByKeyFluentHelper;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
+	
+	public class BusinessPartnerReadByKeyCommand extends ErpCommand<BusinessPartner> {
+	
+	    private final ErpConfigContext erpConfigContext;
+	    private String businessPartner;
+	
+	    public BusinessPartnerReadByKeyCommand(ErpConfigContext erpConfigContext, String businessPartner) {
+	        super(BusinessPartnerReadByKeyCommand.class, erpConfigContext);
+	        this.businessPartner = businessPartner;
+	        this.erpConfigContext = erpConfigContext;
+	    }
+	
+	    @Override
+	    protected BusinessPartner run() {
+	
+	        BusinessPartnerByKeyFluentHelper service = new DefaultBusinessPartnerService()
+	                .getBusinessPartnerByKey(businessPartner);
+	
+	        try {
+	            return service.execute(erpConfigContext);
+	        } catch (final ODataException e) {
+	            throw new HystrixBadRequestException(e.getMessage(), e);
+	        }
+	    }
+	}
+	```
+
 	![](images/37.png)
 
-1. After a few minutes, you should receive a message informing you that the build process has finished successfully  
+1. Double click on the *BusinessPartnerReadCommand*, enter the following content and save the file
+
+	```java
+	import com.netflix.hystrix.exception.HystrixBadRequestException;
+	import com.sap.cloud.sdk.odatav2.connectivity.ODataException;
+	import com.sap.cloud.sdk.s4hana.connectivity.ErpCommand;
+	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.helper.Order;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartnerField;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartnerFluentHelper;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultBusinessPartnerService;
+	import com.sap.cloud.sdk.service.prov.api.request.OrderByExpression;
+	
+	import java.util.*;
+	
+	public class BusinessPartnerReadCommand extends ErpCommand<List<BusinessPartner>> {
+	
+	   
+	    private final int top;
+	    private final int skip;
+	    private final BusinessPartnerField[] selectedProperties;
+	    private final List<OrderByExpression> orderByProperties;
+	    private final ErpConfigContext erpConfigContext;
+	
+	
+	    public BusinessPartnerReadCommand(ErpConfigContext erpConfigContext, int top, int skip, List<String> properties, List<OrderByExpression> orderByProperties) {
+	        super(BusinessPartnerReadCommand.class, erpConfigContext);
+	        this.erpConfigContext = erpConfigContext;
+	        this.top = top;
+	        this.skip = skip;
+	        selectedProperties = properties.stream().
+	                map(property -> new BusinessPartnerField(property))
+	                .toArray(BusinessPartnerField[]::new);
+	
+	        this.orderByProperties = orderByProperties;
+	    }
+	
+	    @Override
+	    protected List<BusinessPartner> run() {
+	
+	        BusinessPartnerFluentHelper service = new DefaultBusinessPartnerService()
+	                .getAllBusinessPartner();
+	
+	        orderByProperties.stream().forEach(expression -> service.orderBy(new BusinessPartnerField<>(expression.getOrderByProperty()), expression.isDescending() ? Order.DESC : Order.ASC));
+	
+	        service.select(selectedProperties);
+	
+	        if (skip > 0)
+	            service.skip(skip);
+	
+	        if (top > 0)
+	            service.top(top);
+	
+	        try {
+	            return service.execute(erpConfigContext);
+	
+	        } catch (final ODataException e) {
+	            throw new HystrixBadRequestException(e.getMessage(), e);
+	        }
+	    }
+	}
+	```
 	![](images/38.png)
 
 
+1. Finally, double click on the *BusinessPartnerRead*, enter the following content and save the file
 
-### <a name="deploy-project"></a>Deploy the project
-1. We can deploy now our solution, but since we have a very tight memory and disk space in our Cloud Foundry environment, due to the Trial limitations, we need to go to the Cloud Foundry cockpit and stop the builder. We no longer need it for the moment   
-	![](images/39.png)
-
-1. Once stopped the builder, go back to SAP Web IDE and locate the new folder in your workspace named *mta_archives*. Inside this folder you should find a subfolder with the name of your project and, inside of it, a file named "*bpr\_bam\_0.0.1.mtar*". This is the package we are going to deploy to Cloud Foundry  
-	![](images/40.png)
-
-1. Right click on this file and choose **Deploy -> Deploy to SAP Cloud Platform**  
-	![](images/41.png)
-
-1. Specify your API Endpoint and click **Deploy**  
-	![](images/42.png)
-
-1. After some minutes, the process ends and you should get a message informing you that the service has been created. Click on **Open**  
-	![](images/43.png)
-
-1. A list with all the defined OData Endpoints is shown. At moment we have only one. Click on its link  
-	![](images/44.png)
-
-1. The service information is shown. This tells you that there is a "businesspartners" entity defined in this service  
-	![](images/45.png)
-
-1. Indeed, by appending the string "businesspartners" to the OData Endpoint you should get the list of all the business partners retrieved by the service  
-	![](images/46.png)
-
-
-
-### <a name="frontend-module"></a>Add the frontend module
-
-1. Go back to SAP Web IDE and right click on the name of the project. Choose **New -> HTML5 Module**  
-	![](images/47.png)
-
-1. Select the **SAPUI5 Application** template and click **Next**  
-	![](images/48.png)
-
-1. Enter
+	```java
+	package com.sap.sample.bpr_bam.crud;
 	
-	| Parameter | Value |
-	| --------- | ----- |
-	| Module name | frontend |
-	| Namespace | com.sap.sample |
+	import com.sap.cloud.sdk.service.prov.api.operations.Read;
+	import com.sap.cloud.sdk.service.prov.api.response.ReadResponse;
 	
-	end click **Next**   
-	![](images/49.png)
-
-1. Keep all by default and click **Finish**  
-	![](images/50.png)
-
-1. A new HTML5 module named *frontend* is added to your project. Open the file *View1.view.xml*  
-	![](images/51.png)
-
-1. Replace the "content" tag with the following and save the file
-
-	```xml
-	<content>
-		<!-- Add this between the content tags -->
-		<List headerText="Business Partners" items="{businessPartner>/}">
-			<StandardListItem title="{businessPartner>BusinessPartnerName}" description="{businessPartner>BusinessPartner}"/>
-		</List>
-	</content>
-	```
-	![](images/52.png)
-
-1. Open the controller file named *View1.controller.js*  
-	![](images/53.png)
-
-1. Replace the entire content with this and save the file
-
-	```js
-	sap.ui.define([
-		"sap/ui/core/mvc/Controller",
-			"sap/ui/model/json/JSONModel"
-	], function (Controller,JSONModel) {
-		"use strict";
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
 	
-		return Controller.extend("com.sap.sample.frontend.controller.View1", {
-			onInit: function() {
-				var view = this.getView();
+	import java.util.List;
+	import java.util.stream.Collectors;
 	
-				jQuery.get("/businesspartners")
-					.done(function(data) {
-						var model = new JSONModel(data);
-						view.setModel(model, "businessPartner");
-					});
-			}
-		});
-	});
-	```
-	![](images/54.png)
-
-1. Open the *xs-app.json* file  
-	![](images/55.png)
-
-1. Add the following route to the existing one (of course don't forget to add a comma before this piece as shown on line 12 in the screen shot) and save the file
-
-	```json
-	{
-	  "source": "^/businesspartners",
-	  "target": "/odata/v2/CatalogService/businesspartners",
-	  "destination": "bpserv"
+	import com.sap.sample.bpr_bam.commands.BusinessPartnerReadByKeyCommand;
+	import com.sap.sample.bpr_bam.commands.BusinessPartnerReadCommand;
+	import com.sap.cloud.sdk.s4hana.connectivity.ErpConfigContext;
+	import com.sap.cloud.sdk.s4hana.datamodel.odata.namespaces.businesspartner.BusinessPartner;
+	import com.sap.cloud.sdk.service.prov.api.operations.Query;
+	import com.sap.cloud.sdk.service.prov.api.request.QueryRequest;
+	import com.sap.cloud.sdk.service.prov.api.request.ReadRequest;
+	import com.sap.cloud.sdk.service.prov.api.response.QueryResponse;
+	
+	
+	public class BusinessPartnerRead {
+	    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	    @Read(serviceName = "CrudService", entity = "BusinessPartner")
+	    public ReadResponse readSingleCustomerByKey(ReadRequest readRequest) {
+	        logger.debug("Received the following keys: {} ", readRequest.getKeys().entrySet().stream().map(x -> x.getKey() + ":" + x.getValue())
+	                .collect(Collectors.joining(" | ")));
+	
+	        String id = String.valueOf(readRequest.getKeys().get("BusinessPartner"));
+	
+	        BusinessPartner partner = new BusinessPartnerReadByKeyCommand(new ErpConfigContext("ErpQueryEndpoint"), id).execute();
+	
+	        ReadResponse readResponse = ReadResponse.setSuccess().setData(partner).response();
+	
+	        return readResponse;
+	    }
+	
+	    @Query(serviceName = "CrudService", entity = "BusinessPartner")
+	    public QueryResponse queryCustomers(QueryRequest qryRequest) {
+	
+	        List<BusinessPartner> businessPartners = new BusinessPartnerReadCommand(new ErpConfigContext("ErpQueryEndpoint"),
+	                qryRequest.getTopOptionValue(),
+	                qryRequest.getSkipOptionValue(),
+	                qryRequest.getSelectProperties(),
+	                qryRequest.getOrderByProperties())
+	                .execute();
+	
+	        QueryResponse queryResponse = QueryResponse.setSuccess().setData(businessPartners).response();
+	        return queryResponse;
+	    }
 	}
 	```
-	![](images/56.png)
 
-1. Open the *mta.yaml* file: a module named "frontend" should be already there  
-	![](images/57.png)
+	![](images/39.png)
 
-1. Replace this module with the following content paying attention to change the TENANT\_HOST\_PATTERN variable accoringly: you must put your API endpoint. Then save the file
+1. As a final step, before we build the project, we need to adjust the deployment settings. So double click on the *mta.yaml* file to open it in the editor
+	![](images/40.png)
+
+1. Adapt the code in this file as the following (you could also copy & paste this in there) and save the file
 
 	```yml
-	 - name: frontend
-	   type: html5
-	   path: frontend
-	   parameters:
-	      disk-quota: 768M
-	      memory: 256M
-	      no-start: true
-	   build-parameters:
-	      builder: grunt
-	   requires:
-	    - name: bpr_xsuaa
-	   properties:
-	     TENANT_HOST_PATTERN: '^(.*)-trial-dev-frontend.cfapps.eu10.hana.ondemand.com'
+	ID: bpr_bam
+	_schema-version: '3.1'
+	version: 0.0.1
+	
+	modules:
+	  - name: bpcrud
+	    type: java
+	    path: srv
+	    parameters:
+	      disk-quota: 512M
+	      memory: 768M
+	    provides:
+	      - name: srv_api
+	        properties:
+	          url: '${default-url}'
+	    requires:
+	      - name: bpr_destination
+	      - name: bpr_xsuaa
+	
+	resources:
+	  - name: bpr_destination
+	    type: destination
+	    description: Destination Service
+	  - name: bpr_xsuaa
+	    type: com.sap.xs.uaa
 	```
+	![](images/41.png)
+
+
+
+
+### <a name="build-deploy"></a>Build and deploy the project
+1. We can build the project. Right click on the project's name and choose **Build -> Build** 
+	![](images/42.png)
+
+1. After a while, you should receive a "BUILD SUCCESS" message
+	![](images/43.png)
+
+1. A new folder named *mta_archives* should be available in the project exporer of your SAP Web IDE
+	![](images/44.png)
+
+1. Right click on the *bpr\_bam\_0.0.1.mtar* package located under this folder and choose **Deploy -> Deploy to SAP Cloud Platform**
+	![](images/45.png)
+
+1. Enter your **Cloud Foundry API Endpoint** with your credentials and click **Deploy**
+	![](images/46.png)
+
+1. After a few minutes the deployment ends and you should receive a message with a button to go straight to the service. Click on the **Open** button
+	![](images/47.png)
+
+1. A new browser page opens up, showing the content of this service. It reports all the available OData Endpoints. For this service we have just one: click on its link
+	![](images/48.png)
+
+1. The endpoint is reached and its definition is shown
+	![](images/49.png)
+
+1. If you append the "BusinessPartner" entity name to this OData Endpoint you will get the list of all available business partners coming from the service
+	![](images/50.png)
+
+
+
+
+### <a name="add-annotations"></a>Add some annotations to the service
+1. Before we create our frontend application with the List Report template, we want to create some OData annotations directly on the main service. To do this, right click on the *srv* folder and choose **New -> File**
+	![](images/51.png)
+
+1. Enter *main-annotations-cds* as the name for this new file and click **OK**
+	![](images/52.png)
+
+1. Enter the following content for this file and save it. We are simply annotating two data fields under the UI.LineItem annotation
+
+	```
+	using CrudService as cs from './my-service.cds';
+	
+	annotate cs.BusinessPartner with @(
+		UI: {
+			LineItem: [ 
+				{$Type: 'UI.DataField', Value: LastName, "@UI.Importance": #High},
+				{$Type: 'UI.DataField', Value: FirstName, "@UI.Importance": #High}
+			]
+		}
+	);
+	```
+	![](images/53.png)
+
+
+
+
+### <a name="frontend-application"></a>Create the front end application, build and deploy again
+
+1. Now let's create our frontend application. Right click on the *bpr\_bam* project and choose **New -> HTML5 Module**
+	![](images/54.png)
+
+1. Under the **Featured** category, choose the **List Report Application** template and click **Next**
+	![](images/55.png)
+
+1. Enter "frontend" for both **Module Name** and **Title** fields and click **Next**
+	![](images/56.png)
+
+1. Select **Current Project** as the data source and check that you are able to see the **CrudService** you defined earlier. Then click **Next**
+	![](images/57.png)
+
+1. Click **Next**
 	![](images/58.png)
 
-1. If you scroll down you can also get rid of the further Cloud Foundry services the system created for you. Please delete them and save the file again  
+1. Choose **BusinessPartner** as OData Collection and click **Finish**
 	![](images/59.png)
 
-1. This is how the *mta.yaml* file should look like after all these changes  
+1. This is what you should get at the end
 	![](images/60.png)
 
+1. Open the *mta.yaml* file in the editor and adjust the *frontend* module as the following. Pay attention to modify the URL in the **TENANT\_HOST\_PATTERN** according to your Cloud Foundry API Endpoint. Save the file
 
-
-### <a name="build-deploy"></a>Build and deploy to backend system with some final adjustments
-1. We need to build the project again so go back to your Cloud Foundry cockpit and restart the builder  
+	```yml
+	  - name: frontend
+	    type: html5
+	    path: frontend
+	    parameters:
+	       disk-quota: 1024M
+	       memory: 1024M
+	    build-parameters:
+	       builder: grunt
+	    requires:
+	     - name: srv_api
+	       group: destinations
+	       properties:
+	          forwardAuthToken: true
+	          strictSSL: false
+	          name: srv_api
+	          url: ~{url}
+	     - name: bpr_xsuaa
+	    properties:
+	      TENANT_HOST_PATTERN: '^(.*)-trial-dev-frontend.cfapps.eu10.hana.ondemand.com'
+	```
 	![](images/61.png)
 
-1. Once done, go to SAP Web IDE and build the project  
+1. Let's build the project again. Right click on the project's name and choose **Build -> Build**
 	![](images/62.png)
 
-1. The build process should finish successfully  
+1. Your build process should finish successfully
 	![](images/63.png)
 
-1. In the cockpit, stop the builder since we no longer need it  
+1. Since we have only 2GB of space in our Cloud Foundry Trial Landscape, we need to go on the cockpit and temporarily stop the builder application. Stop it and go back to SAP Web IDE
 	![](images/64.png)
 
-1. Deploy the MTAR file again  
+1. Right click on the *bpm\_bam\_0.0.1.mtar* file and choose **Deploy -> Deploy to SAP Cloud Platform**
 	![](images/65.png)
 
-1. Choose again the right settings and click **Deploy**  
+1. Enter again your **Cloud Foundry API Endpoint** and the related credentials and click **Deploy**
 	![](images/66.png)
 
-1. After some minutes, the deployment finishes: close all the toast messages  
+1. After some minutes the deployment ends and you get the chance to open the just deployed frontend application directly from SAP Web IDE. Click on the **Open** button for the frontend application
 	![](images/67.png)
 
-1. In the cockpit, the new *frontend* application has been successfully deployed. We put it in the status of stopped since we need to adjust some settings on it  
+1. The frontend application is opened. Enter your SAP Cloud Platform credentials and click **Log On**
 	![](images/68.png)
 
-1. Open a Terminal window and enter the following command
-
-	```sh
-	cf set-env frontend destinations '[{"name": "bpserv", "url": "<<<<< your service host name >>>>>"}]'
-	```
-	where **<<<<< your service host name >>>>>** is the host name in the link to the list to your business partners  
+1. The launch pad is shown. Click on the **frontend** tile
 	![](images/69.png)
 
-1. Once done, click on the *frontend* app in the cockpit  
+1. The List Report application is shown. Notice that you can already see in the list header the two fields we  defined in the annotation file earlier. Click on **Go**
 	![](images/70.png)
 
-1. Check that the destination is correctly in place  
+1. The list of business partners is shown (many are empty because they simply don't have any LastName and FirstName)
 	![](images/71.png)
 
-1. Go back and start the *frontend* from the cockpit  
-	![](images/72.png)
-
-1. When up and running click on the application's name  
-	![](images/73.png)
-
-1. Click on the application's link  
-	![](images/74.png)
-
-1. Enter your SAP CP Trial Landscape credentials and click **Log On**  
-	![](images/75.png)
-
-1. The frontend application opens and should show you the list of business partners retrieved from the service you defined
-	![](images/76.png)
-
-1. Congratulations! You have successfully completed the exercise
+1. Congratulations! You have successfully completed the exercise.
 
 
 
 ## Summary
-This concludes the exercise. You should have learned how to create a new application with the Business Application Programming Model template in SAP Web IDE Full-Stack and how to create in the same project a frontend application to consume your business partners service. Please proceed with the next exercise.
+This concludes the exercise. You should have learned how to create a new application with the Application Programming Model template in SAP Web IDE Full-Stack and how to create in the same project a frontend application to consume your business partners service. Please proceed with the next exercise.
